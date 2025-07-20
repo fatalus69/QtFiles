@@ -15,7 +15,7 @@ std::vector<FileEntry> list_files(const std::string& path, bool hide_hidden_file
             continue;
         }
         
-        file_entry.filename = entry.path().filename().string();
+        file_entry.filename = entry.path().filename().u8string();
         file_entry.is_directory = entry.is_directory();
 
         result.push_back(file_entry);
@@ -42,10 +42,9 @@ std::vector<FileEntry> search_in_dir(const std::string& search_directory, std::s
     std::vector<FileEntry> result;
     for (const auto& entry : std::filesystem::directory_iterator(search_directory)) {
         FileEntry file_entry;
-        std::string filename = entry.path().filename().string();
+        std::string filename = entry.path().filename().u8string();
         
         //Make lowercase for case-insensitive comparison
-        // std::transform(filename.begin(), filename.end(), filename.begin(), ::tolower);
         filename = to_lowercase(filename);
         search_term = to_lowercase(search_term);
 

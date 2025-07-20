@@ -3,3 +3,4 @@ venv
 backend/pybind11
 build/*
 gui/**.so
+gui/**.pyd
