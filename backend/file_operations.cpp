@@ -17,6 +17,7 @@ std::vector<FileEntry> list_files(const std::string& path, bool hide_hidden_file
         
         file_entry.filename = entry.path().filename().u8string();
         file_entry.is_directory = entry.is_directory();
+        file_entry.filesize = static_cast<int>(entry.file_size());
 
         result.push_back(file_entry);
     }

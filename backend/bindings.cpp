@@ -12,11 +12,8 @@ PYBIND11_MODULE(fileops, m) {
     
     py::class_<FileEntry>(m, "FileEntry")
         .def_readonly("filename", &FileEntry::filename)
-        .def_readonly("is_directory", &FileEntry::is_directory);
+        .def_readonly("is_directory", &FileEntry::is_directory)
+        .def_readonly("filesize", &FileEntry::filesize);
     
     m.def("get_home_directory", &get_home_directory, "Get current users home directory");
 }
-
-// PYBIND11_MODULE(utils, m) {
-
-// }

@@ -5,6 +5,7 @@
 struct FileEntry {
     std::string filename;
     bool is_directory;
+    int filesize;
 };
 
 std::vector<FileEntry> list_files(const std::string& path, bool hide_hidden_files);
