@@ -12,6 +12,7 @@ class FileExplorer(QWidget):
         super().__init__()
         self.setWindowTitle("QtFiles")
         self.setFixedSize(800, 400)
+        self.settings = fileops.Settings()
         self.init_ui()
         self.load_files(self.current_path)
 
@@ -51,7 +52,8 @@ class FileExplorer(QWidget):
         layout.addLayout(self.top_bar)
 
         self.list_widget = QListWidget()
-        self.list_widget.setStyleSheet("QListWidget::item:selected { background-color: lightgrey; }")
+        self.list_widget.setStyleSheet(f"QListWidget::item:selected {{ background-color: {self.settings.get_setting('selected_bg_color')}; }}"
+)
 
         layout.addWidget(self.list_widget)
         
@@ -95,18 +97,20 @@ class FileExplorer(QWidget):
             file_layout.setSpacing(6)
 
             filename_label = QLabel(file.filename)
-            filename_label.setStyleSheet("font-size: 13px;")
-
+            filename_label.setStyleSheet(f"font-size: {self.settings.get_setting("font_size")}px;")
+                      
+            icon_size_int = int(self.settings.get_setting("icon_size"))
+            
             icon_label = QLabel()
             icon_label.setPixmap(self.icon_cache[icon_to_load])
-            icon_label.setFixedSize(16, 16)
+            icon_label.setFixedSize(icon_size_int, icon_size_int)
             icon_label.setScaledContents(True)
 
             file_layout.addWidget(icon_label)
             file_layout.addWidget(filename_label)
 
             item = QListWidgetItem()
-            item.setSizeHint(QSize(0, 25))
+            item.setSizeHint(QSize(0, int(self.settings.get_setting("item_height"))))
             item.setData(Qt.UserRole, os.path.join(self.current_path, file.filename))
             item.setData(Qt.UserRole + 1, file.is_directory)
 
@@ -137,3 +141,4 @@ class FileExplorer(QWidget):
         
     def open_settings(self):
         Settings()
+        self.load_files(self.current_path)
