@@ -52,13 +52,11 @@ class FileExplorer(QWidget):
         layout.addLayout(self.top_bar)
 
         self.list_widget = QListWidget()
-        self.list_widget.setStyleSheet(f"QListWidget::item:selected {{ background-color: {self.settings.get_setting('selected_bg_color')}; }}"
-)
+        self.list_widget.setStyleSheet(f"QListWidget::item:selected {{ background-color: {self.settings.get_setting('selected_bg_color')}; }}")
 
         layout.addWidget(self.list_widget)
         
         self.files_to_render = []
-
         self.list_widget.itemDoubleClicked.connect(self.on_item_double_clicked)
 
     def load_files(self, fp):
