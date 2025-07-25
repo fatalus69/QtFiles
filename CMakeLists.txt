@@ -16,6 +16,5 @@ link_libraries(${Python3_LIBRARIES})
 pybind11_add_module(fileops
     backend/bindings.cpp
     backend/file_operations.cpp
-    backend/utils.cpp
     backend/settings.cpp
 )

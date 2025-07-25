@@ -53,10 +53,11 @@ int levenshtein(const std::string& s1, const std::string& s2) {
 
     for (size_t i = 1; i <= len1; ++i) {
         for (size_t j = 1; j <= len2; ++j) {
-            if (s1[i - 1] == s2[j - 1])
+            if (s1[i - 1] == s2[j - 1]) {
                 dp[i][j] = dp[i - 1][j - 1];
-            else
+            } else {
                 dp[i][j] = std::min({ dp[i - 1][j] + 1, dp[i][j - 1] + 1, dp[i - 1][j - 1] + 1 });
+            }
         }
     }
 
@@ -64,18 +65,26 @@ int levenshtein(const std::string& s1, const std::string& s2) {
 }
 
 std::vector<FileEntry> search_in_dir(const std::string& search_directory, std::string& search_term) {
-    int max_distance = 3;
+    //better results for smaller search terms
+    int max_distance = std::max(1, static_cast<int>(search_term.length() * 0.3));
+
     std::vector<FileEntry> result;
     std::string search_lc = to_lowercase(search_term);
 
     for (const auto& entry : std::filesystem::recursive_directory_iterator(search_directory)) {
-        if (!entry.is_regular_file() && !entry.is_directory())
+        if (!entry.is_regular_file() && !entry.is_directory()) {
             continue;
+        }
 
         std::string filename = entry.path().filename().u8string();
         std::string filename_lc = to_lowercase(filename);
 
-        int distance = levenshtein(search_lc, filename_lc);
+        int distance;
+        if (filename_lc.find(search_lc) != std::string::npos) {
+            distance = 0;
+        } else {
+            distance = levenshtein(search_lc, filename_lc);
+        }
 
         if (distance <= max_distance) {
             FileEntry file_entry;
