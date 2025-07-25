@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import (
-    QWidget, QVBoxLayout, QLineEdit, QHBoxLayout, QMessageBox,
-    QListWidget, QListWidgetItem, QLabel, QMenuBar, QAction, QDialog
+    QWidget, QVBoxLayout, QLineEdit, QHBoxLayout, QTreeWidgetItem, QHeaderView,
+    QLabel, QMenuBar, QAction, QTreeWidget
 )
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt, QTimer, QSize
@@ -51,13 +51,20 @@ class FileExplorer(QWidget):
 
         layout.addLayout(self.top_bar)
 
-        self.list_widget = QListWidget()
-        self.list_widget.setStyleSheet(f"QListWidget::item:selected {{ background-color: {self.settings.get_setting('selected_bg_color')}; }}")
+        self.tree_widget = QTreeWidget()
+        self.tree_widget.setRootIsDecorated(False) # For now
+        self.tree_widget.setColumnCount(2)
+        self.tree_widget.setHeaderLabels(["Name", "Size"])
+        self.tree_widget.setStyleSheet(f"QTreeWidget::item:selected {{ background-color: {self.settings.get_setting('selected_bg_color')}; }}")
 
-        layout.addWidget(self.list_widget)
+        header = self.tree_widget.header()
+        header.setSectionResizeMode(0, QHeaderView.Stretch)
+        header.setSectionResizeMode(1, QHeaderView.ResizeToContents) 
+
+        layout.addWidget(self.tree_widget)
         
         self.files_to_render = []
-        self.list_widget.itemDoubleClicked.connect(self.on_item_double_clicked)
+        self.tree_widget.itemDoubleClicked.connect(self.on_item_double_clicked)
 
     def load_files(self, fp):
         if not isinstance(fp, str):
@@ -65,7 +72,7 @@ class FileExplorer(QWidget):
 
         self.current_path = fp
         self.directory_display.setText(self.current_path)
-        self.list_widget.clear()
+        self.tree_widget.clear()
 
         files = fileops.list_files(fp, False)
         self.files_to_render = files
@@ -77,10 +84,15 @@ class FileExplorer(QWidget):
 
         while self.files_to_render and count < BATCH_SIZE:
             file = self.files_to_render.pop(0)
+
             file_widget = QWidget()
             file_layout = QHBoxLayout(file_widget)
-            filename_label = QLabel(file.filename)
+            file_layout.setContentsMargins(4, 2, 4, 2)
+            file_layout.setSpacing(6)
 
+            icon_size_int = int(self.settings.get_setting("icon_size"))
+            item_height = int(self.settings.get_setting("item_height"))
+            
             if file.is_directory:
                 if fileops.check_for_dir_contents(os.path.join(self.current_path, file.filename)):
                     icon_to_load = "folder_filled"
@@ -89,42 +101,38 @@ class FileExplorer(QWidget):
             else:
                 icon_to_load = "file"
 
-            file_widget = QWidget()
-            file_layout = QHBoxLayout(file_widget)
-            file_layout.setContentsMargins(4, 2, 4, 2)
-            file_layout.setSpacing(6)
-
-            filename_label = QLabel(file.filename)
-            filename_label.setStyleSheet(f"font-size: {self.settings.get_setting("font_size")}px;")
-                      
-            icon_size_int = int(self.settings.get_setting("icon_size"))
-            
             icon_label = QLabel()
             icon_label.setPixmap(self.icon_cache[icon_to_load])
             icon_label.setFixedSize(icon_size_int, icon_size_int)
             icon_label.setScaledContents(True)
 
+            filename_label = QLabel(file.filename)
+            filename_label.setStyleSheet(f"font-size: {self.settings.get_setting('font_size')}px;")
+
             file_layout.addWidget(icon_label)
             file_layout.addWidget(filename_label)
+            file_layout.addStretch()
 
-            item = QListWidgetItem()
-            item.setSizeHint(QSize(0, int(self.settings.get_setting("item_height"))))
-            item.setData(Qt.UserRole, os.path.join(self.current_path, file.filename))
-            item.setData(Qt.UserRole + 1, file.is_directory)
+            item = QTreeWidgetItem(["", str(file.filesize)])
+            item.setSizeHint(0, QSize(0, item_height))
 
-            self.list_widget.addItem(item)
-            self.list_widget.setItemWidget(item, file_widget)
+            item.setData(0, Qt.UserRole, os.path.join(self.current_path, file.filename))
+            item.setData(0, Qt.UserRole + 1, bool(file.is_directory))
+
+            self.tree_widget.addTopLevelItem(item)
+            self.tree_widget.setItemWidget(item, 0, file_widget)
 
             count += 1
 
         if self.files_to_render:
             QTimer.singleShot(10, self.render_next_batch)
 
-    def on_item_double_clicked(self, item):
-        is_directory = item.data(Qt.UserRole + 1)
+    def on_item_double_clicked(self, item, column):
+        filepath = item.data(0, Qt.UserRole)
+        is_directory = item.data(0, Qt.UserRole + 1)
 
         if is_directory:
-            self.load_files(item.data(Qt.UserRole))
+            self.load_files(filepath)
 
     def on_directory_entered(self):
         self.load_files(self.directory_display.text())
@@ -133,7 +141,7 @@ class FileExplorer(QWidget):
         search_text = self.search_bar.text()
         fileops_result = fileops.search_in_dir(self.current_path, search_text)
 
-        self.list_widget.clear()
+        self.tree_widget.clear()
         self.files_to_render = fileops_result
         self.render_next_batch()
         

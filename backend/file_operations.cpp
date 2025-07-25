@@ -14,12 +14,11 @@ std::vector<FileEntry> list_files(const std::string& path, bool hide_hidden_file
         if (hide_hidden_files == true && filename.rfind(".", 0) == 0) {
             continue;
         }
+        long long default_size = 2048; // Size of directories on Unix systems
         
         file_entry.filename = entry.path().filename().u8string();
         file_entry.is_directory = entry.is_directory();
-        if (!file_entry.is_directory) {
-            file_entry.filesize = static_cast<int>(entry.file_size());;
-        }
+        file_entry.filesize = !file_entry.is_directory ? get_formatted_byte(static_cast<long long>(entry.file_size())) : get_formatted_byte(default_size);
 
         result.push_back(file_entry);
     }
@@ -29,6 +28,30 @@ std::vector<FileEntry> list_files(const std::string& path, bool hide_hidden_file
     });
 
     return result;
+}
+
+std::string get_formatted_byte(long long bytes) {
+    const double KB = 1024.0;
+    const double MB = KB * 1024;
+    const double GB = MB * 1024;
+    const double TB = GB * 1024;
+
+    std::ostringstream oss;
+    oss << std::fixed << std::setprecision(2);
+
+    if (bytes >= TB) {
+        oss << (bytes / TB) << " TiB";
+    } else if (bytes >= GB) {
+        oss << (bytes / GB) << " GiB";
+    } else if (bytes >= MB) {
+        oss << (bytes / MB) << " MiB";
+    } else if (bytes >= KB) {
+        oss << (bytes / KB) << " KiB";
+    } else {
+        oss << bytes << " B";
+    }
+
+    return oss.str();
 }
 
 bool check_for_dir_contents(const std::string& path) {
