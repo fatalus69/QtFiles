@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt, QTimer, QSize
 from settings import Settings
+from actions import Actions
 import fileops, os
 
 class FileExplorer(QWidget):
@@ -15,6 +16,7 @@ class FileExplorer(QWidget):
         self.settings = fileops.Settings()
         self.init_ui()
         self.load_files(self.current_path)
+        self.actions = Actions(self)
 
     def init_ui(self):
         layout = QVBoxLayout(self)
@@ -105,15 +107,21 @@ class FileExplorer(QWidget):
             icon_label.setPixmap(self.icon_cache[icon_to_load])
             icon_label.setFixedSize(icon_size_int, icon_size_int)
             icon_label.setScaledContents(True)
+            
+            font_color = self.settings.get_setting('font_color')
+            font_size = self.settings.get_setting('font_size')
 
             filename_label = QLabel(file.filename)
-            filename_label.setStyleSheet(f"font-size: {self.settings.get_setting('font_size')}px;")
+            filename_label.setStyleSheet(f"font-size: {font_size}px; color: {font_color};")
+
+            filesize_label = QLabel(file.filesize)
+            filesize_label.setStyleSheet(f"font-size: {font_size}px; color: {font_color};")
 
             file_layout.addWidget(icon_label)
             file_layout.addWidget(filename_label)
             file_layout.addStretch()
 
-            item = QTreeWidgetItem(["", str(file.filesize)])
+            item = QTreeWidgetItem(["", ""])
             item.setSizeHint(0, QSize(0, item_height))
 
             item.setData(0, Qt.UserRole, os.path.join(self.current_path, file.filename))
@@ -121,6 +129,7 @@ class FileExplorer(QWidget):
 
             self.tree_widget.addTopLevelItem(item)
             self.tree_widget.setItemWidget(item, 0, file_widget)
+            self.tree_widget.setItemWidget(item, 1, filesize_label)
 
             count += 1
 
@@ -147,4 +156,7 @@ class FileExplorer(QWidget):
         
     def open_settings(self):
         Settings()
+        self.load_files(self.current_path)
+        
+    def refresh(self):
         self.load_files(self.current_path)
