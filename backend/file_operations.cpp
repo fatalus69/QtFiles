@@ -16,7 +16,7 @@ std::vector<FileEntry> list_files(const std::string& path, bool hide_hidden_file
         }
         long long default_size = 2048; // Size of directories on Unix systems
         
-        file_entry.filename = entry.path().filename().u8string();
+        file_entry.filename = reinterpret_cast<const char*>(entry.path().filename().u8string().c_str());        
         file_entry.is_directory = entry.is_directory();
         file_entry.filesize = !file_entry.is_directory ? get_formatted_byte(static_cast<long long>(entry.file_size())) : get_formatted_byte(default_size);
 
@@ -99,7 +99,7 @@ std::vector<FileEntry> search_in_dir(const std::string& search_directory, std::s
             continue;
         }
 
-        std::string filename = entry.path().filename().u8string();
+        std::string filename = reinterpret_cast<const char*>(entry.path().filename().u8string().c_str());
         std::string filename_lc = to_lowercase(filename);
 
         int distance;
@@ -111,7 +111,7 @@ std::vector<FileEntry> search_in_dir(const std::string& search_directory, std::s
 
         if (distance <= max_distance) {
             FileEntry file_entry;
-            file_entry.filename = entry.path().u8string();
+            file_entry.filename = reinterpret_cast<const char*>(entry.path().filename().u8string().c_str());
             file_entry.is_directory = entry.is_directory();
             file_entry.match_score = distance;
 

@@ -6,3 +6,4 @@ build/*
 gui/**.so
 gui/**.pyd
 **__pycache__**
+vcpkg_installed
