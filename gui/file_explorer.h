@@ -29,6 +29,7 @@ private slots:
 private:
     void initUI();
     void loadFiles(const QString &path);
+    void createList(auto entries, bool from_search = false);
 
     QVBoxLayout *mainLayout;
     QHBoxLayout *topBar;

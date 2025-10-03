@@ -69,12 +69,19 @@ void FileExplorer::loadFiles(const QString &path)
 {
   current_path = path.toStdString();
   directoryDisplay->setText(path);
-  treeWidget->clear();
   
   auto entries = list_files(current_path, false);
 
-  for (const auto &entry : entries)
-  {
+  createList(entries);
+}
+
+
+void FileExplorer::createList(auto entries, bool from_search) {
+  treeWidget->clear();
+
+  for (const auto &entry : entries) {
+    qDebug() << entry.filename;
+
     QString iconKey = entry.is_directory == true ? "folder_filled" : "file";
 
     QWidget *fileWidget = new QWidget();
@@ -87,7 +94,15 @@ void FileExplorer::loadFiles(const QString &path)
     iconLabel->setFixedSize(16, 16);
     iconLabel->setScaledContents(true);
 
-    QLabel *filenameLabel = new QLabel(QString::fromStdString(entry.filename));
+    /*
+    if (from_search == true) {
+      if (entry.fullpath.find(entry.filename) != std::string::npos) {
+      }
+    }*/
+
+    std::string filename = (from_search == true) ? entry.full_path : entry.filename;
+
+    QLabel *filenameLabel = new QLabel(QString::fromStdString(filename));
     fileLayout->addWidget(iconLabel);
     fileLayout->addWidget(filenameLabel);
     fileLayout->addStretch();
@@ -95,23 +110,12 @@ void FileExplorer::loadFiles(const QString &path)
     QLabel *filesizeLabel = new QLabel(QString::fromStdString(entry.filesize));
 
     QTreeWidgetItem *item = new QTreeWidgetItem({"", ""});
-    item->setData(0, Qt::UserRole, QString::fromStdString(entry.filename));
+    item->setData(0, Qt::UserRole, QString::fromStdString(filename));
     item->setData(0, Qt::UserRole + 1, entry.is_directory);
 
     treeWidget->addTopLevelItem(item);
     treeWidget->setItemWidget(item, 0, fileWidget);
     treeWidget->setItemWidget(item, 1, filesizeLabel);
-  }
-}
-
-void FileExplorer::onItemDoubleClicked(QTreeWidgetItem *item, int column)
-{
-  QString filepath = item->data(0, Qt::UserRole).toString();
-  bool is_directory = item->data(0, Qt::UserRole + 1).toBool();
-
-  if (is_directory == true) {
-    std::string filepath_string = current_path + "/" + filepath.toStdString();
-    loadFiles(QString::fromStdString(filepath_string));
   }
 }
 
@@ -121,11 +125,30 @@ void FileExplorer::onDirectoryEntered()
   loadFiles(QString::fromStdString(directory_text));
 }
 
+void FileExplorer::onItemDoubleClicked(QTreeWidgetItem *item, int column)
+{
+  QString filepath = item->data(0, Qt::UserRole).toString();
+  bool is_directory = item->data(0, Qt::UserRole + 1).toBool();
+
+  if (is_directory == true) {
+    std::string filepath_string = filepath.toStdString();
+    if (filepath_string.find(current_path) == std::string::npos) {
+      filepath_string = current_path + "/" + filepath_string;
+    }
+
+    loadFiles(QString::fromStdString(filepath_string));
+  }
+}
+
+
 void FileExplorer::onSearchEntered()
 {
-  QString searchText = search_bar->text();
-  qDebug() << "Search for:" << searchText;
-  //search
+  std::string search_text = search_bar->text().toStdString();
+
+  auto search_result = search_in_dir(current_path, search_text);
+  bool is_from_search = true;
+
+  createList(search_result, is_from_search);
 }
 
 void FileExplorer::openSettings()

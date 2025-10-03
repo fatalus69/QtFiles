@@ -4,6 +4,7 @@
 
 struct FileEntry {
     std::string filename;
+    std::string full_path;
     bool is_directory;
     std::string filesize;
     int match_score;
