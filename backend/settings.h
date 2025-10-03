@@ -2,7 +2,7 @@
 #include <string>
 #include <vector>
 #include <utility>
-#include "json.hpp"
+#include <nlohmann/json.hpp>
 
 class Settings {
 private:

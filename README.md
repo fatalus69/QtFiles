@@ -1,31 +1,25 @@
 # QtFiles
-A WIP lightweight file explorer built with PyQt and C++
 
-### Prequistes:
-- `Python 3.10`
-- `C++ 17`
+**A lightweight, work-in-progress file explorer built with [Qt6](https://www.qt.io/product/qt6) and C++.**
+
+### Requirements:
+- `Qt6` installed on your system
+- `C++ 20` or higher
 - `CMake 3.14`
 
+### Build & Run
 
-### Usage
-1. clone pybind11 into the backend directory
-````bash
-git clone https://github.com/pybind/pybind11.git backend/pybind11
- ````
-
-2. Activate python venv and install dependencies
-````bash
-python3 -m venv venv
-source venv/bin/activate
-pip-sync # If you are using pip-tools
-````
-
-3. Compile C++ Code
+##### 1. Build
 ````bash
 bash build.sh
 ````
 
-3. Run the UI
+##### 2. Run
 ````bash
-python gui/main.py
+./build/FileExplorer
+````
+
+#### Or alternatively to build and run
+````bash
+bash build.sh --run
 ````
