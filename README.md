@@ -7,14 +7,6 @@
 - `C++ 20` or higher
 - `CMake 3.14`
 
-You’ll also need [`nlohmann/json`](https://github.com/nlohmann/json).
-To fetch the single-header release:
-
-````bash
-wget -P ./backend https://github.com/nlohmann/json/releases/download/v3.12.0/json.hpp
-````
-
-
 ### Build & Run
 
 ##### 1. Build
