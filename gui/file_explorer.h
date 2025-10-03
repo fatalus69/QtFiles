@@ -28,7 +28,7 @@ private slots:
 
 private:
     void initUI();
-    void loadFiles(std::string &path);
+    void loadFiles(const QString &path);
 
     QVBoxLayout *mainLayout;
     QHBoxLayout *topBar;

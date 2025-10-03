@@ -1,9 +1,4 @@
-venv
 .vscode
-backend/pybind11
 backend/json.hpp
 build/*
-gui/**.so
-gui/**.pyd
-**__pycache__**
 vcpkg_installed

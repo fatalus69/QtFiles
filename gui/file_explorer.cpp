@@ -7,6 +7,7 @@
 #include "file_explorer.h"
 #include "file_operations.h"
 #include "utils.h"
+#include <iostream>
 #include <string>
 
 FileExplorer::FileExplorer(): QWidget()
@@ -16,7 +17,7 @@ FileExplorer::FileExplorer(): QWidget()
   initUI();
 
   current_path = get_home_directory();
-  loadFiles(current_path);
+  loadFiles(QString::fromStdString(current_path));
 }
 
 void FileExplorer::initUI()
@@ -64,10 +65,10 @@ void FileExplorer::initUI()
   mainLayout->addWidget(treeWidget);
 }
 
-void FileExplorer::loadFiles(std::string &path)
+void FileExplorer::loadFiles(const QString &path)
 {
-  current_path = path;
-  directoryDisplay->setText(current_path);
+  current_path = path.toStdString();
+  directoryDisplay->setText(path);
   treeWidget->clear();
   
   auto entries = list_files(current_path, false);
@@ -86,7 +87,7 @@ void FileExplorer::loadFiles(std::string &path)
     iconLabel->setFixedSize(16, 16);
     iconLabel->setScaledContents(true);
 
-    QLabel *filenameLabel = new QLabel(entry.filename);
+    QLabel *filenameLabel = new QLabel(QString::fromStdString(entry.filename));
     fileLayout->addWidget(iconLabel);
     fileLayout->addWidget(filenameLabel);
     fileLayout->addStretch();
@@ -94,7 +95,7 @@ void FileExplorer::loadFiles(std::string &path)
     QLabel *filesizeLabel = new QLabel(QString::fromStdString(entry.filesize));
 
     QTreeWidgetItem *item = new QTreeWidgetItem({"", ""});
-    item->setData(0, Qt::UserRole, QString(entry.filename));
+    item->setData(0, Qt::UserRole, QString::fromStdString(entry.filename));
     item->setData(0, Qt::UserRole + 1, entry.is_directory);
 
     treeWidget->addTopLevelItem(item);
@@ -108,16 +109,16 @@ void FileExplorer::onItemDoubleClicked(QTreeWidgetItem *item, int column)
   QString filepath = item->data(0, Qt::UserRole).toString();
   bool is_directory = item->data(0, Qt::UserRole + 1).toBool();
 
-  if (is_directory) {
-    std::string filepath_string = filepath.toStdString();
-    loadFiles(filepath_string);
+  if (is_directory == true) {
+    std::string filepath_string = current_path + "/" + filepath.toStdString();
+    loadFiles(QString::fromStdString(filepath_string));
   }
 }
 
 void FileExplorer::onDirectoryEntered()
 {
   std::string directory_text = directoryDisplay->text().toStdString();
-  loadFiles(directory_text);
+  loadFiles(QString::fromStdString(directory_text));
 }
 
 void FileExplorer::onSearchEntered()
