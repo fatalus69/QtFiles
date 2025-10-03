@@ -4,6 +4,18 @@ set -e
 
 BUILD_DIR="build"
 
+run=0
+
+for arg in "$@"; do
+    case $arg in
+        --run)
+            run=1
+            ;;
+        *)
+            ;;
+    esac
+done
+
 mkdir -p "$BUILD_DIR"
 
 cmake -B "$BUILD_DIR" -S . \
@@ -11,6 +23,7 @@ cmake -B "$BUILD_DIR" -S . \
 
 cmake --build "$BUILD_DIR" -j$(nproc)
 
-if [ "$1" == "run" ]; then
-    "$BUILD_DIR/FileExplorer"
+
+if [ $run == 1 ]; then
+    ./"$BUILD_DIR/QtFiles"
 fi

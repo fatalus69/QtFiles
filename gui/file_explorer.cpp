@@ -80,8 +80,6 @@ void FileExplorer::createList(auto entries, bool from_search) {
   treeWidget->clear();
 
   for (const auto &entry : entries) {
-    qDebug() << entry.filename;
-
     QString iconKey = entry.is_directory == true ? "folder_filled" : "file";
 
     QWidget *fileWidget = new QWidget();
@@ -93,12 +91,6 @@ void FileExplorer::createList(auto entries, bool from_search) {
     iconLabel->setPixmap(icon_cache[iconKey]);
     iconLabel->setFixedSize(16, 16);
     iconLabel->setScaledContents(true);
-
-    /*
-    if (from_search == true) {
-      if (entry.fullpath.find(entry.filename) != std::string::npos) {
-      }
-    }*/
 
     std::string filename = (from_search == true) ? entry.full_path : entry.filename;
 
@@ -151,9 +143,11 @@ void FileExplorer::onSearchEntered()
   createList(search_result, is_from_search);
 }
 
+/**
+ * We'll ignore settings for now.
+ */
 void FileExplorer::openSettings()
 {
   qDebug() << "Open settings";
   //open settings
-  // loadFiles(current_path);
 }

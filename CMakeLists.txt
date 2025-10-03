@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(FileExplorer LANGUAGES CXX)
+project(QtFiles LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_AUTOMOC ON)
@@ -18,6 +18,16 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(nlohmann_json)
 
+
+FetchContent_Declare(
+  googletest
+  GIT_REPOSITORY https://github.com/google/googletest.git
+  GIT_TAG v1.14.0
+)
+# Prevent GoogleTest from overriding compiler settings
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(googletest)
+
 add_library(backend
     backend/file_operations.cpp
     backend/settings.cpp
@@ -25,16 +35,24 @@ add_library(backend
 target_include_directories(backend PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/backend)
 target_link_libraries(backend PRIVATE nlohmann_json::nlohmann_json)
 
-add_executable(FileExplorer
+add_executable(QtFiles
     gui/main.cpp
     gui/file_explorer.cpp
 )
 
-target_link_libraries(FileExplorer PRIVATE
+target_link_libraries(QtFiles PRIVATE
     Qt6::Core
     Qt6::Gui
     Qt6::Widgets
     nlohmann_json::nlohmann_json
     backend
 )
+
+# ---- Tests ----
+#enable_testing()
+#
+# ...
+#
+#include(GoogleTest)
+#gtest_discover_tests(backend_tests)
 
