@@ -14,7 +14,7 @@ inline std::string separator() {
     return std::string(1, PATH_SEPARATOR);
 }
 
-inline std::string get_home_directory() {
+inline std::string getHomeDirectory() {
 #ifdef _WIN32
     const char* homedir = std::getenv("USERPROFILE");
 #else

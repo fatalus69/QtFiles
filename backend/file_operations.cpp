@@ -5,33 +5,37 @@
 #include <cctype>
 #include "file_operations.h"
 
-std::vector<FileEntry> list_files(const std::string& path, bool hide_hidden_files) {
+/**
+ * We currently crash when entering an invalid path.
+ * Perhaps prevent this by returning and empty FileEntry vector?
+ */
+std::vector<FileEntry> listFiles(const std::string& directory_path, bool hide_hidden_files) {
     std::vector<FileEntry> result;
-    for (const auto& entry : std::filesystem::directory_iterator(path)) {
+    for (const auto& entry : std::filesystem::directory_iterator(directory_path)) {
         FileEntry file_entry;
         std::string filename = entry.path().filename().string();
         
         if (hide_hidden_files == true && filename.rfind(".", 0) == 0) {
             continue;
         }
-        long long default_size = 2048; // Size of directories on Unix systems
+        long long default_size = 2048; // Default size of directories on Unix
         
-        file_entry.filename = entry.path().filename().string();
-        file_entry.full_path = entry.path().string();
+        file_entry.name = entry.path().filename().string();
+        file_entry.path = entry.path().string();
         file_entry.is_directory = entry.is_directory();
-        file_entry.filesize = !file_entry.is_directory ? get_formatted_byte(static_cast<long long>(entry.file_size())) : get_formatted_byte(default_size);
+        file_entry.size = !file_entry.is_directory ? getFormattedByte(static_cast<long long>(entry.file_size())) : getFormattedByte(default_size);
 
         result.push_back(file_entry);
     }
 
     std::sort(result.begin(), result.end(), [](const FileEntry& a, const FileEntry& b) {
-        return a.filename < b.filename;
+        return a.name < b.name;
     });
 
     return result;
 }
 
-std::string get_formatted_byte(long long bytes) {
+std::string getFormattedByte(long long bytes) {
     const double KB = 1024.0;
     const double MB = KB * 1024;
     const double GB = MB * 1024;
@@ -55,16 +59,7 @@ std::string get_formatted_byte(long long bytes) {
     return oss.str();
 }
 
-//A try catch is anything but ideal here.
-bool check_for_dir_contents(const std::string& path) {
-    try {
-        return !std::filesystem::is_empty(path);
-    } catch (const std::filesystem::filesystem_error& e) {
-        return true; // Assume it's not empty if we can't check
-    }
-}
-
-std::string to_lowercase(std::string str) {
+std::string toLowercase(std::string str) {
     std::transform(str.begin(), str.end(), str.begin(), ::tolower);
     return str;
 }
@@ -89,20 +84,24 @@ int levenshtein(const std::string& s1, const std::string& s2) {
     return dp[len1][len2];
 }
 
-std::vector<FileEntry> search_in_dir(const std::string& search_directory, std::string& search_term) {
+
+/**
+ * Add a default return value when there are no results.
+ */
+std::vector<FileEntry> searchDirectory(const std::string& directory_path, std::string& query) {
     //better results for smaller search terms
-    int max_distance = std::max(1, static_cast<int>(search_term.length() * 0.3));
+    int max_distance = std::max(1, static_cast<int>(query.length() * 0.3));
 
     std::vector<FileEntry> result;
-    std::string search_lc = to_lowercase(search_term);
+    std::string search_lc = toLowercase(query);
 
-    for (const auto& entry : std::filesystem::recursive_directory_iterator(search_directory)) {
+    for (const auto& entry : std::filesystem::recursive_directory_iterator(directory_path)) {
         if (!entry.is_regular_file() && !entry.is_directory()) {
             continue;
         }
 
         std::string filename = entry.path().filename().string();
-        std::string filename_lc = to_lowercase(filename);
+        std::string filename_lc = toLowercase(filename);
 
         int distance;
         if (filename_lc.find(search_lc) != std::string::npos) {
@@ -113,8 +112,8 @@ std::vector<FileEntry> search_in_dir(const std::string& search_directory, std::s
 
         if (distance <= max_distance) {
             FileEntry file_entry;
-            file_entry.filename = filename;
-            file_entry.full_path = entry.path().string();
+            file_entry.name = filename;
+            file_entry.path = entry.path().string();
             file_entry.is_directory = entry.is_directory();
             file_entry.match_score = distance;
 
