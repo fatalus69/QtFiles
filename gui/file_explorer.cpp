@@ -1,14 +1,7 @@
-#include <QHeaderView>
-#include <QDir>
-#include <QFileInfoList>
-#include <QFileInfo>
-#include <QDebug>
-
 #include "file_explorer.h"
-#include "file_operations.h"
-#include "utils.h"
+
 #include <iostream>
-#include <string>
+
 
 FileExplorer::FileExplorer(): QWidget()
 {
@@ -101,6 +94,7 @@ void FileExplorer::createList(auto entries, ListMode mode) {
     std::string filename = (mode == ListMode::Search) ? file.path : file.name;
 
     QLabel *filename_label = new QLabel(QString::fromStdString(filename));
+    filename_label->setObjectName("filename_label");
     file_layout->addWidget(icon_label);
     file_layout->addWidget(filename_label);
     file_layout->addStretch();
@@ -117,6 +111,58 @@ void FileExplorer::createList(auto entries, ListMode mode) {
   }
 }
 
+void FileExplorer::keyPressEvent(QKeyEvent *event) {
+  if (event->key() == Qt::Key_F2) {
+    QTreeWidgetItem *item = tree_widget->currentItem();
+    if (item) {
+      handleRename(item);
+    }
+  } else {
+    QWidget::keyPressEvent(event);
+  }
+}
+
+void FileExplorer::handleRename(QTreeWidgetItem *item) {
+  QWidget *file_widget = tree_widget->itemWidget(item, 0);
+  if (!file_widget) {
+    return;
+  }
+
+  QHBoxLayout *layout = qobject_cast<QHBoxLayout*>(file_widget->layout());
+  if (!layout) {
+    return;
+  }
+
+  QLabel *filename_label = file_widget->findChild<QLabel *>("filename_label");
+  if (!filename_label) {
+    return;
+  }
+
+  QString filename = filename_label->text();
+
+  QLineEdit *edit = new QLineEdit(filename, file_widget);
+  edit->selectAll();
+  layout->replaceWidget(filename_label, edit);
+
+  //This kinda doesnt work tbh
+  filename_label->hide();
+
+  edit->setFocus();
+
+  connect(edit, &QLineEdit::editingFinished, this, [this, filename, edit, filename_label, item]() {
+    QString new_name = edit->text().trimmed();
+
+    if (!new_name.isEmpty() && new_name != filename_label->text()) {
+      std::string filepath = current_path + PATH_SEPARATOR + filename.toStdString();
+
+      //renameFile(filepath, new_name.toStdString());
+    }
+
+    // Reload current directory after changing filenames
+    loadFiles(QString::fromStdString(current_path));
+  });
+}
+
 void FileExplorer::onDirectoryEntered()
 {
   std::string dir_path = directory_display->text().toStdString();
@@ -131,13 +177,12 @@ void FileExplorer::onItemDoubleClicked(QTreeWidgetItem *item, int column)
   if (is_directory == true) {
     std::string filepath_string = filepath.toStdString();
     if (filepath_string.find(current_path) == std::string::npos) {
-      filepath_string = current_path + "/" + filepath_string;
+      filepath_string = current_path + PATH_SEPARATOR + filepath_string;
     }
 
     loadFiles(QString::fromStdString(filepath_string));
   }
 }
-
 
 void FileExplorer::onSearchEntered()
 {
@@ -146,7 +191,6 @@ void FileExplorer::onSearchEntered()
 
   createList(search_result, ListMode::Search);
 }
-
 
 /**
  * We'll ignore settings for now.

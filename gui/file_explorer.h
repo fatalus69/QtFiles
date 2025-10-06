@@ -9,11 +9,16 @@
 #include <QMenuBar>
 #include <QAction>
 #include <QTreeWidget>
-
 #include <QPixmap>
 #include <QTimer>
 #include <QSize>
+#include <QKeyEvent>
+#include <QDebug>
+
 #include <string>
+
+#include "file_operations.h"
+#include "utils.h"
 
 class FileExplorer : public QWidget 
 {
@@ -25,6 +30,8 @@ private slots:
     void onDirectoryEntered();
     void onSearchEntered();
     void openSettings();
+    void keyPressEvent(QKeyEvent *event);
+    void handleRename(QTreeWidgetItem *item);
 
     // Extensible for Favourites, etc.
     enum class ListMode {
