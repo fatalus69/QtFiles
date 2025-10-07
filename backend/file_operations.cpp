@@ -2,6 +2,7 @@
 #include <vector>
 #include <filesystem>
 #include <algorithm>
+#include <iostream>
 #include <cctype>
 #include "file_operations.h"
 
@@ -127,4 +128,15 @@ std::vector<FileEntry> searchDirectory(const std::string& directory_path, std::s
     });
 
     return result;
+}
+
+void renameFile(const std::string& full_path, const std::string& new_path) {
+    namespace fs = std::filesystem;
+
+    fs::path src(full_path);
+    fs::path destination = new_path;
+
+    if (fs::exists(src)) {
+        fs::rename(src, destination);
+    }
 }

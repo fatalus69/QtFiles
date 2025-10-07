@@ -12,7 +12,7 @@ struct FileEntry {
 
 std::vector<FileEntry> listFiles(const std::string& directory_path, bool hide_hidden_files);
 std::vector<FileEntry> searchDirectory(const std::string& directory_path, std::string& query);
-void renameFile(const std::string& full_path, const std::string& new_name);
+void renameFile(const std::string& full_path, const std::string& new_path);
 std::string getFormattedByte(long long bytes);
 
 std::string toLowercase(std::string str);

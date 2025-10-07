@@ -124,27 +124,19 @@ void FileExplorer::keyPressEvent(QKeyEvent *event) {
 
 void FileExplorer::handleRename(QTreeWidgetItem *item) {
   QWidget *file_widget = tree_widget->itemWidget(item, 0);
-  if (!file_widget) {
-    return;
-  }
+  if (!file_widget) return;
 
   QHBoxLayout *layout = qobject_cast<QHBoxLayout*>(file_widget->layout());
-  if (!layout) {
-    return;
-  }
+  if (!layout) return;
 
   QLabel *filename_label = file_widget->findChild<QLabel *>("filename_label");
-  if (!filename_label) {
-    return;
-  }
+  if (!filename_label) return;
 
   QString filename = filename_label->text();
 
   QLineEdit *edit = new QLineEdit(filename, file_widget);
   edit->selectAll();
   layout->replaceWidget(filename_label, edit);
-
-  //This kinda doesnt work tbh
   filename_label->hide();
 
   edit->setFocus();
@@ -155,7 +147,9 @@ void FileExplorer::handleRename(QTreeWidgetItem *item) {
     if (!new_name.isEmpty() && new_name != filename_label->text()) {
       std::string filepath = current_path + PATH_SEPARATOR + filename.toStdString();
 
-      //renameFile(filepath, new_name.toStdString());
+      std::string new_path = current_path + PATH_SEPARATOR + new_name.toStdString();
+
+      renameFile(filepath, new_path);
     }
 
     // Reload current directory after changing filenames
