@@ -9,11 +9,16 @@
 #include <QMenuBar>
 #include <QAction>
 #include <QTreeWidget>
-
 #include <QPixmap>
 #include <QTimer>
 #include <QSize>
+#include <QKeyEvent>
+#include <QDebug>
+
 #include <string>
+
+#include "file_operations.h"
+#include "utils.h"
 
 class FileExplorer : public QWidget 
 {
@@ -25,22 +30,29 @@ private slots:
     void onDirectoryEntered();
     void onSearchEntered();
     void openSettings();
+    void keyPressEvent(QKeyEvent *event);
+    void handleRename(QTreeWidgetItem *item);
+
+    // Extensible for Favourites, etc.
+    enum class ListMode {
+      Normal,
+      Search
+    };
 
 private:
     void initUI();
     void loadFiles(const QString &path);
-    void createList(auto entries, bool from_search = false);
+    void createList(auto entries, ListMode mode = ListMode::Normal);
 
-    QVBoxLayout *mainLayout;
-    QHBoxLayout *topBar;
+    QVBoxLayout *main_layout;
+    QHBoxLayout *top_bar;
 
-    QMenuBar *menuBar;
-    QLineEdit *directoryDisplay;
+    QMenuBar *menu_bar;
+    QLineEdit *directory_display;
     QLineEdit *search_bar;
-    QTreeWidget *treeWidget;
+    QTreeWidget *tree_widget;
 
     QMap<QString, QPixmap> icon_cache;
 
     std::string current_path;
-    QList<QVariant> filesToRender; // Placeholder — replace with your file object type
 };

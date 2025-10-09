@@ -8,18 +8,18 @@
 using json = nlohmann::json;
 
 Settings::Settings() {
-    this->SETTINGS_FP = get_home_directory() + separator() + this->SETTINGS_DIR + separator() + this->SETTINGS_FILENAME;
-    this->init_settings();
+    this->SETTINGS_FP = getHomeDirectory() + separator() + this->SETTINGS_DIR + separator() + this->SETTINGS_FILENAME;
+    this->initSettings();
 }
 
-void Settings::init_settings() {
+void Settings::initSettings() {
     if (std::filesystem::exists(this->SETTINGS_FP)) {
         std::ifstream file(this->SETTINGS_FP);
         file >> settings_json;
         return;
     }
 
-    std::filesystem::create_directories(get_home_directory() + separator() + SETTINGS_DIR);
+    std::filesystem::create_directories(getHomeDirectory() + separator() + SETTINGS_DIR);
 
     // Init values
     settings_json = {
@@ -35,7 +35,7 @@ void Settings::init_settings() {
 }
 
 //Not used
-std::vector<std::pair<std::string, std::string>> Settings::load_settings() {
+std::vector<std::pair<std::string, std::string>> Settings::loadSettings() {
     std::vector<std::pair<std::string, std::string>> result;
     if (std::filesystem::exists(this->SETTINGS_FP)) {
         std::ifstream file(this->SETTINGS_FP);
@@ -47,14 +47,14 @@ std::vector<std::pair<std::string, std::string>> Settings::load_settings() {
     return result;
 }
 
-std::string Settings::get_setting(const std::string& setting) {
+std::string Settings::getSetting(const std::string& setting) {
     if (settings_json.contains(setting)) {
         return settings_json[setting].dump();
     }
     return "";
 }
 
-void Settings::set_setting(const std::string& key, const std::string& value) {
+void Settings::setSetting(const std::string& key, const std::string& value) {
     try {
         settings_json[key] = json::parse(value);
     } catch (const json::parse_error& e) {
