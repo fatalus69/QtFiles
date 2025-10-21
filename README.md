@@ -16,7 +16,7 @@ bash build.sh
 
 ##### 2. Run
 ````bash
-./build/FileExplorer
+./build/QtFiles
 ````
 
 #### Or alternatively to build and run
