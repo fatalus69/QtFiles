@@ -1,25 +1,24 @@
 # QtFiles
 
-**A lightweight, work-in-progress file explorer built with [Qt6](https://www.qt.io/product/qt6) and C++.**
+**A lightweight, work‑in‑progress file explorer built with [Qt6](https://www.qt.io/product/qt6) and C++.**
 
-### Requirements:
-- `Qt6` installed on your system
-- `C++ 20` or higher
-- `CMake 3.14`
+## Requirements
+- `Qt 6`
+- `C++ 20` or newer
+- `CMake` >= 3.14
 
-### Build & Run
-
-##### 1. Build
-````bash
+## Quick start
+```bash
+# build
 bash build.sh
-````
 
-##### 2. Run
-````bash
-./build/QtFiles
-````
-
-#### Or alternatively to build and run
-````bash
+# build and run
 bash build.sh --run
-````
+
+# run binary after build
+./build/QtFiles
+
+# run tests
+bash build.sh --test # can be combined with the --run flag
+ctest --test-dir build
+```
