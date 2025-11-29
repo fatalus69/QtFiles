@@ -8,6 +8,8 @@
 - `CMake` >= 3.14
 
 ## Quick start
+The script works the same for Windows - in case you have Qt6 installed.
+So on Windows you simply run `build.ps1`
 ```bash
 # build
 bash build.sh
