@@ -1,4 +1,7 @@
 .vscode
-backend/json.hpp
 build/*
 vcpkg_installed
+
+# directories created by tests
+tests/modified_dir
+tesets/test_dir

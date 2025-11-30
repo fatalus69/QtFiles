@@ -1,10 +1,6 @@
-#include <string>
-#include <vector>
-#include <filesystem>
-#include <algorithm>
-#include <iostream>
-#include <cctype>
 #include "file_operations.h"
+
+namespace fs = std::filesystem;
 
 /**
  * We currently crash when entering an invalid path.
@@ -130,13 +126,46 @@ std::vector<FileEntry> searchDirectory(const std::string& directory_path, std::s
     return result;
 }
 
-void renameFile(const std::string& full_path, const std::string& new_path) {
-    namespace fs = std::filesystem;
-
+bool renameFile(const std::string& full_path, const std::string& new_path) {
     fs::path src(full_path);
     fs::path destination = new_path;
 
     if (fs::exists(src)) {
         fs::rename(src, destination);
+        return fs::exists(destination);
     }
+
+    return false;
+}
+
+bool createFile(const std::string& full_path, FileType type) {
+    fs::path path = full_path;
+
+    if (fs::exists(path)) return false;
+    
+    switch (type)
+    {
+        case FileType::File : {
+            fs::create_directories(path.parent_path());
+            std::ofstream ofs(path);
+
+            return fs::exists(path);
+        }
+        case FileType::Directory : {
+            fs::create_directory(path);
+
+            return fs::exists(path);
+        }
+        default:
+            return false;
+    }
+}
+
+bool deleteFile(const std::string& full_path) {
+    fs::path path = full_path;
+
+    if (!fs::exists(path)) return false;
+
+    fs::remove_all(path);
+    return !fs::exists(path);
 }
