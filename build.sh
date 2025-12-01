@@ -31,7 +31,6 @@ fi
 mkdir -p "$BUILD_DIR"
 
 cmake -G "Unix Makefiles" -B "$BUILD_DIR" -S . -DCMAKE_BUILD_TYPE=Debug
-
 cmake --build "$BUILD_DIR" -j$(nproc)
 
 if [ $test == 1 ]; then

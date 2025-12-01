@@ -3,6 +3,8 @@
 
 #include <string>
 #include <cstdlib>
+#include <algorithm>
+#include <QString>
 
 #ifdef _WIN32
     constexpr char PATH_SEPARATOR = '\\';
@@ -21,6 +23,35 @@ inline std::string getHomeDirectory() {
     const char* homedir = std::getenv("HOME");
 #endif
     return homedir ? std::string(homedir) : std::string{};
+}
+
+inline QString formatByte(long long bytes, double multiplier = 1024.0) {
+    const double KB = multiplier;
+    const double MB = KB * multiplier;
+    const double GB = MB * multiplier;
+    const double TB = GB * multiplier;
+
+    std::ostringstream oss;
+    oss << std::fixed << std::setprecision(2);
+
+    if (bytes >= TB) {
+        oss << (bytes / TB) << " TiB";
+    } else if (bytes >= GB) {
+        oss << (bytes / GB) << " GiB";
+    } else if (bytes >= MB) {
+        oss << (bytes / MB) << " MiB";
+    } else if (bytes >= KB) {
+        oss << (bytes / KB) << " KiB";
+    } else {
+        oss << bytes << " B";
+    }
+
+    return QString::fromStdString(oss.str());
+}
+
+inline std::string toLowercase(std::string str) {
+    std::transform(str.begin(), str.end(), str.begin(), ::tolower);
+    return str;
 }
 
 #endif

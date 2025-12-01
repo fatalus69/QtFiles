@@ -23,4 +23,7 @@ bash build.sh --run
 # run tests
 bash build.sh --test # can be combined with the --run flag
 ctest --test-dir build
+
+# build clean, run test and run
+bash build.sh --clean --test --run
 ```

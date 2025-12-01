@@ -1,4 +1,5 @@
 #include "file_operations.h"
+#include "utils.h"
 
 namespace fs = std::filesystem;
 
@@ -8,7 +9,8 @@ namespace fs = std::filesystem;
  */
 std::vector<FileEntry> listFiles(const std::string& directory_path, bool hide_hidden_files) {
     std::vector<FileEntry> result;
-    for (const auto& entry : std::filesystem::directory_iterator(directory_path)) {
+
+    for (const auto& entry : fs::directory_iterator(directory_path)) {
         FileEntry file_entry;
         std::string filename = entry.path().filename().string();
         
@@ -20,7 +22,7 @@ std::vector<FileEntry> listFiles(const std::string& directory_path, bool hide_hi
         file_entry.name = entry.path().filename().string();
         file_entry.path = entry.path().string();
         file_entry.is_directory = entry.is_directory();
-        file_entry.size = !file_entry.is_directory ? getFormattedByte(static_cast<long long>(entry.file_size())) : getFormattedByte(default_size);
+        file_entry.size = !file_entry.is_directory ? static_cast<long long>(entry.file_size()) : default_size;
 
         result.push_back(file_entry);
     }
@@ -30,35 +32,6 @@ std::vector<FileEntry> listFiles(const std::string& directory_path, bool hide_hi
     });
 
     return result;
-}
-
-std::string getFormattedByte(long long bytes) {
-    const double KB = 1024.0;
-    const double MB = KB * 1024;
-    const double GB = MB * 1024;
-    const double TB = GB * 1024;
-
-    std::ostringstream oss;
-    oss << std::fixed << std::setprecision(2);
-
-    if (bytes >= TB) {
-        oss << (bytes / TB) << " TiB";
-    } else if (bytes >= GB) {
-        oss << (bytes / GB) << " GiB";
-    } else if (bytes >= MB) {
-        oss << (bytes / MB) << " MiB";
-    } else if (bytes >= KB) {
-        oss << (bytes / KB) << " KiB";
-    } else {
-        oss << bytes << " B";
-    }
-
-    return oss.str();
-}
-
-std::string toLowercase(std::string str) {
-    std::transform(str.begin(), str.end(), str.begin(), ::tolower);
-    return str;
 }
 
 int levenshtein(const std::string& s1, const std::string& s2) {

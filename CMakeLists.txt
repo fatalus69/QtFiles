@@ -29,31 +29,32 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 add_library(backend
-    backend/file_operations.cpp
-    backend/settings.cpp
+  backend/file_operations.cpp
+  backend/settings.cpp
 )
 target_include_directories(backend PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/backend)
 target_link_libraries(backend PRIVATE nlohmann_json::nlohmann_json)
 
 add_executable(QtFiles
-    gui/main.cpp
-    gui/file_explorer.cpp
+  gui/main.cpp
+  gui/file_explorer.cpp
 )
 
 target_link_libraries(QtFiles PRIVATE
-    Qt6::Core
-    Qt6::Gui
-    Qt6::Widgets
-    nlohmann_json::nlohmann_json
-    backend
+  Qt6::Core
+  Qt6::Gui
+  Qt6::Widgets
+  nlohmann_json::nlohmann_json
+  backend
 )
 
-# ---- Tests ----
 enable_testing()
 
-add_executable(run_tests tests/test_file_operations.cpp)
+add_executable(run_tests 
+  tests/test_utils.cpp
+  tests/test_file_operations.cpp
+)
 target_link_libraries(run_tests PRIVATE backend GTest::gtest_main)
 
 include(GoogleTest)
 gtest_discover_tests(run_tests)
-

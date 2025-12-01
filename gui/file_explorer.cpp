@@ -99,7 +99,7 @@ void FileExplorer::createList(auto entries, ListMode mode) {
     file_layout->addWidget(filename_label);
     file_layout->addStretch();
 
-    QLabel *filesize_label = new QLabel(QString::fromStdString(file.size));
+    QLabel *filesize_label = new QLabel(QString::fromStdString(formatByte(file.size)));
 
     QTreeWidgetItem *item = new QTreeWidgetItem({"", ""});
     item->setData(0, Qt::UserRole, QString::fromStdString(filename));

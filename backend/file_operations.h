@@ -11,7 +11,7 @@ struct FileEntry {
     std::string name;
     std::string path;
     bool is_directory;
-    std::string size;
+    long long size;
     int match_score;
 };
 
@@ -31,7 +31,3 @@ std::vector<FileEntry> searchDirectory(const std::string& directory_path, std::s
 bool renameFile(const std::string& full_path, const std::string& new_path);
 bool createFile(const std::string& full_path, FileType type);
 bool deleteFile(const std::string& full_path);
-
-// Utility functions
-std::string getFormattedByte(long long bytes);
-std::string toLowercase(std::string str);
