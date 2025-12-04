@@ -38,7 +38,7 @@ if [ $test == 1 ]; then
     [ -e "./tests/test_dir" ] && rm -rf "./tests/test_dir"
     [ -e "./tests/modified_dir" ] && rm -rf "./tests/modified_dir"
     
-    ctest --test-dir build
+    ctest --test-dir "$BUILD_DIR"
 fi
 
 if [ $run == 1 ]; then

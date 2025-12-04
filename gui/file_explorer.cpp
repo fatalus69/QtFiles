@@ -79,7 +79,7 @@ void FileExplorer::createList(auto entries, ListMode mode) {
   tree_widget->clear();
 
   for (const auto &file : entries) {
-    QString icon_key = file.is_directory == true ? "folder_filled" : "file";
+    QString icon_key = file.type == FileType::Directory ? "folder_filled" : "file";
 
     QWidget *file_widget = new QWidget();
     QHBoxLayout *file_layout = new QHBoxLayout(file_widget);
@@ -99,11 +99,11 @@ void FileExplorer::createList(auto entries, ListMode mode) {
     file_layout->addWidget(filename_label);
     file_layout->addStretch();
 
-    QLabel *filesize_label = new QLabel(QString::fromStdString(formatByte(file.size)));
+    QLabel *filesize_label = new QLabel(formatByte(file.size));
 
     QTreeWidgetItem *item = new QTreeWidgetItem({"", ""});
     item->setData(0, Qt::UserRole, QString::fromStdString(filename));
-    item->setData(0, Qt::UserRole + 1, file.is_directory);
+    item->setData(0, Qt::UserRole + 1, file.type == FileType::Directory);
 
     tree_widget->addTopLevelItem(item);
     tree_widget->setItemWidget(item, 0, file_widget);
@@ -168,7 +168,7 @@ void FileExplorer::onItemDoubleClicked(QTreeWidgetItem *item, int column)
   QString filepath = item->data(0, Qt::UserRole).toString();
   bool is_directory = item->data(0, Qt::UserRole + 1).toBool();
 
-  if (is_directory == true) {
+  if (is_directory) {
     std::string filepath_string = filepath.toStdString();
     if (filepath_string.find(current_path) == std::string::npos) {
       filepath_string = current_path + PATH_SEPARATOR + filepath_string;

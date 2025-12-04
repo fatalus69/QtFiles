@@ -33,6 +33,8 @@ add_library(backend
   backend/settings.cpp
 )
 target_include_directories(backend PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/backend)
+# Add QtCore so we can return QStrings
+target_link_libraries(backend PUBLIC Qt6::Core)
 target_link_libraries(backend PRIVATE nlohmann_json::nlohmann_json)
 
 add_executable(QtFiles

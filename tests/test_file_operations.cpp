@@ -24,6 +24,21 @@ TEST(file_operation_test, createFile) {
     EXPECT_EQ(createFile(original_test_file, FileType::File), false);
 }
 
+TEST(file_operation_test, getFileSize) {
+    long long default_size = 2048;
+    long long custom_default_size = 1234;
+
+    fs::directory_entry original_file(original_test_file);
+    fs::directory_entry modified_file(modified_test_file);
+
+    EXPECT_NE(getFileSize(original_file), default_size);
+    EXPECT_NE(getFileSize(original_file, custom_default_size), custom_default_size);
+    
+    // Expect it to return default size on error.
+    EXPECT_EQ(getFileSize(modified_file), default_size);
+    EXPECT_EQ(getFileSize(modified_file, custom_default_size), custom_default_size);
+}
+
 TEST(file_operation_test, renameFile) {
     EXPECT_EQ(renameFile(original_test_dir, modified_test_dir), true);
 }

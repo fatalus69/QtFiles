@@ -7,8 +7,13 @@ namespace fs = std::filesystem;
  * We currently crash when entering an invalid path.
  * Perhaps prevent this by returning and empty FileEntry vector?
  */
-std::vector<FileEntry> listFiles(const std::string& directory_path, bool hide_hidden_files) {
+std::vector<FileEntry> listFiles(const std::string& directory_path, bool hide_hidden_files) {    
     std::vector<FileEntry> result;
+
+    // Prevent crash when opening invalid path.
+    // maybe Perform that check in the UI, so we can keep the user on the previous path and dont send him into a void.
+    fs::path current_path(directory_path);
+    if (!fs::exists(current_path)) return result;
 
     for (const auto& entry : fs::directory_iterator(directory_path)) {
         FileEntry file_entry;
@@ -17,12 +22,14 @@ std::vector<FileEntry> listFiles(const std::string& directory_path, bool hide_hi
         if (hide_hidden_files == true && filename.rfind(".", 0) == 0) {
             continue;
         }
+
         long long default_size = 2048; // Default size of directories on Unix
         
         file_entry.name = entry.path().filename().string();
         file_entry.path = entry.path().string();
         file_entry.is_directory = entry.is_directory();
-        file_entry.size = !file_entry.is_directory ? static_cast<long long>(entry.file_size()) : default_size;
+        file_entry.type = entry.is_directory() ? FileType::Directory : FileType::File;
+        file_entry.size = entry.is_regular_file() ? getFileSize(entry) : default_size;
 
         result.push_back(file_entry);
     }
@@ -141,4 +148,32 @@ bool deleteFile(const std::string& full_path) {
 
     fs::remove_all(path);
     return !fs::exists(path);
+}
+
+long long getFileSize(const fs::directory_entry& entry, long long default_size) {
+    try {
+        if (!entry.exists()) return default_size;
+
+        if (entry.is_regular_file()) {
+            std::error_code error_code;
+
+            fs::perms permissions = entry.status(error_code).permissions();
+            
+            if (error_code) return default_size;
+
+            if ((permissions & fs::perms::owner_read) == fs::perms::none
+             && (permissions & fs::perms::group_read) == fs::perms::none
+             && (permissions & fs::perms::others_read) == fs::perms::none) {
+                return default_size;
+            }
+
+            std::uintmax_t file_size = entry.file_size(error_code);
+            if (error_code) return default_size;
+            return static_cast<long long>(file_size);
+        }
+    } catch (const fs::filesystem_error&) {
+        return default_size;
+    }
+
+    return default_size;
 }
