@@ -29,7 +29,7 @@ std::vector<FileEntry> listFiles(const std::string& directory_path, bool hide_hi
         file_entry.path = entry.path().string();
         file_entry.is_directory = entry.is_directory();
         file_entry.type = entry.is_directory() ? FileType::Directory : FileType::File;
-        file_entry.size = entry.is_regular_file() ? getFileSize(entry) : default_size;
+        file_entry.size = getFileSize(entry);
 
         result.push_back(file_entry);
     }
@@ -89,10 +89,11 @@ std::vector<FileEntry> searchDirectory(const std::string& directory_path, std::s
 
         if (distance <= max_distance) {
             FileEntry file_entry;
-            file_entry.name = filename;
+            file_entry.name = entry.path().filename().string();
             file_entry.path = entry.path().string();
             file_entry.is_directory = entry.is_directory();
-            file_entry.match_score = distance;
+            file_entry.type = entry.is_directory() ? FileType::Directory : FileType::File;
+            file_entry.size = getFileSize(entry);
 
             result.push_back(file_entry);
         }
