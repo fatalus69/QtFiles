@@ -18,6 +18,7 @@
 #include <string>
 
 #include "file_operations.h"
+#include "types.h"
 #include "utils.h"
 
 class FileExplorer : public QWidget 
@@ -32,12 +33,6 @@ private slots:
     void openSettings();
     void keyPressEvent(QKeyEvent *event);
     void handleRename(QTreeWidgetItem *item);
-
-    // Extensible for Favourites, etc.
-    enum class ListMode {
-      Normal,
-      Search
-    };
 
 private:
     void initUI();

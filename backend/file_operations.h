@@ -1,4 +1,5 @@
 #pragma once
+
 #include <string>
 #include <vector>
 #include <fstream>
@@ -7,26 +8,15 @@
 #include <iostream>
 #include <cctype>
 
-enum class FileType {
-    File,
-    Directory
-};
-
-
-struct FileEntry {
-    std::string name;
-    std::string path;
-    FileType type;
-    bool is_directory;
-    long long size;
-    int match_score;
-};
+#include "utils.h"
+#include "types.h"
 
 // Listings
-std::vector<FileEntry> listFiles(const std::string& directory_path, bool hide_hidden_files);
+std::vector<FileEntry> listFiles(const std::string& directory_path, bool hide_hidden_files = true);
 std::vector<FileEntry> searchDirectory(const std::string& directory_path, std::string& query);
 
-long long getFileSize(const std::filesystem::directory_entry& entry, long long default_size = 2048);
+long long getFileSize(const std::filesystem::directory_entry& entry, filesize default_size = 2048);
+
 /**
  * TODO: Perhaps rename functions, since those are the general functions for 
  * renaming both files and directories. 

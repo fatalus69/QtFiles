@@ -1,12 +1,7 @@
 #include "file_operations.h"
-#include "utils.h"
 
 namespace fs = std::filesystem;
 
-/**
- * We currently crash when entering an invalid path.
- * Perhaps prevent this by returning and empty FileEntry vector?
- */
 std::vector<FileEntry> listFiles(const std::string& directory_path, bool hide_hidden_files) {    
     std::vector<FileEntry> result;
 
@@ -23,11 +18,8 @@ std::vector<FileEntry> listFiles(const std::string& directory_path, bool hide_hi
             continue;
         }
 
-        long long default_size = 2048; // Default size of directories on Unix
-        
         file_entry.name = entry.path().filename().string();
         file_entry.path = entry.path().string();
-        file_entry.is_directory = entry.is_directory();
         file_entry.type = entry.is_directory() ? FileType::Directory : FileType::File;
         file_entry.size = getFileSize(entry);
 
@@ -61,10 +53,6 @@ int levenshtein(const std::string& s1, const std::string& s2) {
     return dp[len1][len2];
 }
 
-
-/**
- * Add a default return value when there are no results.
- */
 std::vector<FileEntry> searchDirectory(const std::string& directory_path, std::string& query) {
     //better results for smaller search terms
     int max_distance = std::max(1, static_cast<int>(query.length() * 0.3));
@@ -91,7 +79,6 @@ std::vector<FileEntry> searchDirectory(const std::string& directory_path, std::s
             FileEntry file_entry;
             file_entry.name = entry.path().filename().string();
             file_entry.path = entry.path().string();
-            file_entry.is_directory = entry.is_directory();
             file_entry.type = entry.is_directory() ? FileType::Directory : FileType::File;
             file_entry.size = getFileSize(entry);
 
@@ -130,16 +117,18 @@ bool createFile(const std::string& full_path, FileType type) {
             fs::create_directories(path.parent_path());
             std::ofstream ofs(path);
 
-            return fs::exists(path);
+            break;
         }
         case FileType::Directory : {
             fs::create_directory(path);
-
-            return fs::exists(path);
+            
+            break;
         }
         default:
             return false;
     }
+
+    return fs::exists(path);
 }
 
 bool deleteFile(const std::string& full_path) {
@@ -151,7 +140,7 @@ bool deleteFile(const std::string& full_path) {
     return !fs::exists(path);
 }
 
-long long getFileSize(const fs::directory_entry& entry, long long default_size) {
+filesize getFileSize(const fs::directory_entry& entry, filesize default_size) {
     try {
         if (!entry.exists()) return default_size;
 
@@ -170,7 +159,7 @@ long long getFileSize(const fs::directory_entry& entry, long long default_size) 
 
             std::uintmax_t file_size = entry.file_size(error_code);
             if (error_code) return default_size;
-            return static_cast<long long>(file_size);
+            return static_cast<filesize>(file_size);
         }
     } catch (const fs::filesystem_error&) {
         return default_size;

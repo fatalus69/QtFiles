@@ -25,8 +25,8 @@ TEST(file_operation_test, createFile) {
 }
 
 TEST(file_operation_test, getFileSize) {
-    long long default_size = 2048;
-    long long custom_default_size = 1234;
+    filesize default_size = 2048;
+    filesize custom_default_size = 1234;
 
     fs::directory_entry original_file(original_test_file);
     fs::directory_entry modified_file(modified_test_file);

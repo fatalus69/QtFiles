@@ -6,6 +6,8 @@
 #include <algorithm>
 #include <QString>
 
+#include "types.h"
+
 #ifdef _WIN32
     constexpr char PATH_SEPARATOR = '\\';
 #else
@@ -25,7 +27,7 @@ inline std::string getHomeDirectory() {
     return homedir ? std::string(homedir) : std::string{};
 }
 
-inline QString formatByte(long long bytes, double multiplier = 1024.0) {
+inline QString formatByte(filesize bytes, double multiplier = 1024.0) {
     const double KB = multiplier;
     const double MB = KB * multiplier;
     const double GB = MB * multiplier;
@@ -35,13 +37,13 @@ inline QString formatByte(long long bytes, double multiplier = 1024.0) {
     oss << std::fixed << std::setprecision(2);
 
     if (bytes >= TB) {
-        oss << (bytes / TB) << " TiB";
+        oss << (bytes / TB) << " T";
     } else if (bytes >= GB) {
-        oss << (bytes / GB) << " GiB";
+        oss << (bytes / GB) << " G";
     } else if (bytes >= MB) {
-        oss << (bytes / MB) << " MiB";
+        oss << (bytes / MB) << " M";
     } else if (bytes >= KB) {
-        oss << (bytes / KB) << " KiB";
+        oss << (bytes / KB) << " K";
     } else {
         oss << bytes << " B";
     }
