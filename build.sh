@@ -37,8 +37,9 @@ if [ $test == 1 ]; then
     # Make sure testing dirs dont exist (e.g. after previously failed tests).
     [ -e "./tests/test_dir" ] && rm -rf "./tests/test_dir"
     [ -e "./tests/modified_dir" ] && rm -rf "./tests/modified_dir"
-    
-    ctest --test-dir "$BUILD_DIR"
+
+    # prettier output than ctest
+    ./"$BUILD_DIR"/run_tests
 fi
 
 if [ $run == 1 ]; then

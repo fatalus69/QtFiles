@@ -17,7 +17,7 @@ struct FileEntry {
     int match_score;
 };
 
-// UI:
+// UI: maybe move this into a gui/types.h file?
 // Perhpas add Favourites, ...
 enum class ListMode {
     Normal,
