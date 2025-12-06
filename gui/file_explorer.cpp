@@ -16,6 +16,10 @@ FileExplorer::FileExplorer(): QWidget()
 
 void FileExplorer::initUI()
 {
+  this->setContextMenuPolicy(Qt::CustomContextMenu);
+  connect(this, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(showContextMenu(const QPoint &)));
+
+
   main_layout = new QVBoxLayout(this);
   menu_bar = new QMenuBar(this);
   QMenu *settings_menu = menu_bar->addMenu("File");
@@ -64,12 +68,7 @@ void FileExplorer::loadFiles(const QString &path)
   current_path = path.toStdString();
   directory_display->setText(path);
   
-  /**
-   * To see hidden files you'll have to change this value to false
-   * until the Settings have been implemented.
-   */
-  bool hide_hidden_files = true;
-  auto entries = listFiles(current_path, hide_hidden_files);
+  auto entries = listFiles(current_path);
 
   createList(entries);
 }
@@ -112,14 +111,28 @@ void FileExplorer::createList(auto entries, ListMode mode) {
 }
 
 void FileExplorer::keyPressEvent(QKeyEvent *event) {
-  if (event->key() == Qt::Key_F2) {
-    QTreeWidgetItem *item = tree_widget->currentItem();
-    if (item) {
-      handleRename(item);
+  QTreeWidgetItem *item = tree_widget->currentItem();
+
+  switch(event->key()) 
+  {
+    case Qt::Key_F2: {
+      if (item) {
+        handleRename(item);
+      }  
     }
-  } else {
-    QWidget::keyPressEvent(event);
+    default:
+      QWidget::keyPressEvent(event);
   }
+}
+
+void FileExplorer::showContextMenu(const QPoint &pos) 
+{
+   QMenu contextMenu(tr("Context menu"), this);
+
+   QAction action1("New", this);
+   contextMenu.addAction(&action1);
+
+   contextMenu.exec(mapToGlobal(pos));
 }
 
 void FileExplorer::handleRename(QTreeWidgetItem *item) {

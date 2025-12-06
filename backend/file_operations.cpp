@@ -2,6 +2,10 @@
 
 namespace fs = std::filesystem;
 
+/**
+ * To see hidden files you'll have to change this value to false
+ * until the Settings have been implemented.
+ */
 std::vector<FileEntry> listFiles(const std::string& directory_path, bool hide_hidden_files) {    
     std::vector<FileEntry> result;
 

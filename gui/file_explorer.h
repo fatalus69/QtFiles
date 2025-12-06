@@ -32,7 +32,9 @@ private slots:
     void onSearchEntered();
     void openSettings();
     void keyPressEvent(QKeyEvent *event);
+    // void mousePressEvent(QMouseEvent *event);
     void handleRename(QTreeWidgetItem *item);
+    void showContextMenu(const QPoint &pos);
 
 private:
     void initUI();
