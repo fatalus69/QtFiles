@@ -17,8 +17,7 @@ FileExplorer::FileExplorer(): QWidget()
 void FileExplorer::initUI()
 {
   this->setContextMenuPolicy(Qt::CustomContextMenu);
-  connect(this, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(showContextMenu(const QPoint &)));
-
+  connect(this, &QWidget::customContextMenuRequested, this, &FileExplorer::showContextMenu);
 
   main_layout = new QVBoxLayout(this);
   menu_bar = new QMenuBar(this);
@@ -127,12 +126,50 @@ void FileExplorer::keyPressEvent(QKeyEvent *event) {
 
 void FileExplorer::showContextMenu(const QPoint &pos) 
 {
-   QMenu contextMenu(tr("Context menu"), this);
+  QAction *create_file_action = new QAction("File", this);
+  QAction *create_directory_action = new QAction("Directory", this);
 
-   QAction action1("New", this);
-   contextMenu.addAction(&action1);
+  // Using lambda, since we need the argument what we want to create.
+  connect(create_file_action, &QAction::triggered, this,
+    [this]() { handleEntityCreate(FileType::File); });
 
-   contextMenu.exec(mapToGlobal(pos));
+  connect(create_directory_action, &QAction::triggered, this,
+    [this]() { handleEntityCreate(FileType::Directory); });
+  QMenu context_menu(tr("Context menu"), this);
+
+  QMenu new_entity_menu("New", this);
+  new_entity_menu.addAction(create_file_action);
+  new_entity_menu.addAction(create_directory_action);
+
+  context_menu.addMenu(&new_entity_menu);
+
+  context_menu.exec(mapToGlobal(pos));
+}
+
+void FileExplorer::handleEntityCreate(FileType type) {
+  QInputDialog dialog(this);
+  QString label_text = QString("Create new ") + QString(type == FileType::File ? "File" : "Directory");
+
+  dialog.setWindowTitle(label_text);
+  dialog.setLabelText("Name:");
+  dialog.setTextValue("");
+  dialog.setOkButtonText("OK");
+  dialog.setCancelButtonText("Cancel");
+  dialog.setModal(true);
+
+  if (dialog.exec() == QDialog::Accepted) {
+    std::string name = dialog.textValue().toStdString();
+    std::filesystem::path path(current_path + PATH_SEPARATOR + name);
+  
+    bool created_entity = createFile(path, type);
+
+    if (!created_entity) {
+      //TODO: perhaps create a modaal here, that tells the user that file creation failed
+      qDebug() << "Error creating Entity" << name;
+    }
+
+    loadFiles(QString::fromStdString(current_path));
+  }
 }
 
 void FileExplorer::handleRename(QTreeWidgetItem *item) {

@@ -1,4 +1,5 @@
 #pragma once
+
 #include <QWidget>
 #include <QVBoxLayout>
 #include <QLineEdit>
@@ -14,6 +15,8 @@
 #include <QSize>
 #include <QKeyEvent>
 #include <QDebug>
+#include <QInputDialog>
+#include <filesystem>
 
 #include <string>
 
@@ -32,8 +35,8 @@ private slots:
     void onSearchEntered();
     void openSettings();
     void keyPressEvent(QKeyEvent *event);
-    // void mousePressEvent(QMouseEvent *event);
     void handleRename(QTreeWidgetItem *item);
+    void handleEntityCreate(FileType type);
     void showContextMenu(const QPoint &pos);
 
 private:
