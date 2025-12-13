@@ -2,7 +2,9 @@
 
 set -e
 
-BUILD_DIR="build"
+PROJECT_ROOT="$(git rev-parse --show-toplevel)"
+BUILD_DIR="$PROJECT_ROOT/build"
+TESTS_DIR="$PROJECT_ROOT/tests"
 
 run=0
 test=0
@@ -24,7 +26,7 @@ for arg in "$@"; do
     esac
 done
 
-if [ $clean == 1 ]; then
+if [ "$clean" -eq 1 ]; then
     rm -rf "$BUILD_DIR"
 fi
 
@@ -33,15 +35,15 @@ mkdir -p "$BUILD_DIR"
 cmake -G "Unix Makefiles" -B "$BUILD_DIR" -S . -DCMAKE_BUILD_TYPE=Debug
 cmake --build "$BUILD_DIR" -j$(nproc)
 
-if [ $test == 1 ]; then
+if [ "$test" -eq 1 ]; then
     # Make sure testing dirs dont exist (e.g. after previously failed tests).
-    [ -e "./tests/test_dir" ] && rm -rf "./tests/test_dir"
-    [ -e "./tests/modified_dir" ] && rm -rf "./tests/modified_dir"
+    [ -e "$TESTS_DIR/test_dir" ] && rm -rf "$TESTS_DIR/test_dir"
+    [ -e "$TESTS_DIR/modified_dir" ] && rm -rf "$TESTS_DIR/modified_dir"
 
     # prettier output than ctest
     ./"$BUILD_DIR"/run_tests
 fi
 
-if [ $run == 1 ]; then
+if [ "$run" -eq 1 ]; then
     ./"$BUILD_DIR/QtFiles"
 fi
