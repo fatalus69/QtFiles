@@ -40,6 +40,7 @@ target_link_libraries(backend PRIVATE nlohmann_json::nlohmann_json)
 add_executable(QtFiles
   gui/main.cpp
   gui/file_explorer.cpp
+  gui/builders/modal_builder.cpp
 )
 
 target_link_libraries(QtFiles PRIVATE

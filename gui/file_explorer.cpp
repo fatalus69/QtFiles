@@ -9,6 +9,8 @@ FileExplorer::FileExplorer(): QWidget()
   setFixedSize(800, 400); //Maybe dont do that.
   initUI();
 
+  this->modal_builder = ModalBuilder();
+
   // Open Explorer in Users home directory
   current_path = getHomeDirectory();
   loadFiles(QString::fromStdString(current_path));
@@ -147,25 +149,18 @@ void FileExplorer::showContextMenu(const QPoint &pos)
 }
 
 void FileExplorer::handleEntityCreate(FileType type) {
-  QInputDialog dialog(this);
   QString label_text = QString("Create new ") + QString(type == FileType::File ? "File" : "Directory");
+  std::string name = this->modal_builder.showInputModal(this, label_text, "Name").toStdString();
 
-  dialog.setWindowTitle(label_text);
-  dialog.setLabelText("Name:");
-  dialog.setTextValue("");
-  dialog.setOkButtonText("OK");
-  dialog.setCancelButtonText("Cancel");
-  dialog.setModal(true);
-
-  if (dialog.exec() == QDialog::Accepted) {
-    std::string name = dialog.textValue().toStdString();
+  if (name != "") {
     std::filesystem::path path(current_path + PATH_SEPARATOR + name);
-  
     bool created_entity = createFile(path, type);
 
     if (!created_entity) {
-      //TODO: perhaps create a modaal here, that tells the user that file creation failed
-      qDebug() << "Error creating Entity" << name;
+      QString error_message = QString("Failed to create ") + QString(type == FileType::File ? "file." : "directory.");
+      this->modal_builder.showErrorModal(error_message);
+
+      return;
     }
 
     loadFiles(QString::fromStdString(current_path));
@@ -210,6 +205,14 @@ void FileExplorer::handleRename(QTreeWidgetItem *item) {
 void FileExplorer::onDirectoryEntered()
 {
   std::string dir_path = directory_display->text().toStdString();
+  std::filesystem::path path(dir_path);
+
+  if (!std::filesystem::exists(path) || !std::filesystem::is_directory(path)) {
+    this->modal_builder.showErrorModal("The specified path does not exist.");
+    directory_display->setText(QString::fromStdString(current_path));
+    return;
+  }
+
   loadFiles(QString::fromStdString(dir_path));
 }
 

@@ -9,11 +9,6 @@ namespace fs = std::filesystem;
 std::vector<FileEntry> listFiles(const std::string& directory_path, bool hide_hidden_files) {    
     std::vector<FileEntry> result;
 
-    // Prevent crash when opening invalid path.
-    // maybe Perform that check in the UI, so we can keep the user on the previous path and dont send him into a void.
-    fs::path current_path(directory_path);
-    if (!fs::exists(current_path)) return result;
-
     for (const auto& entry : fs::directory_iterator(directory_path)) {
         FileEntry file_entry;
         std::string filename = entry.path().filename().string();

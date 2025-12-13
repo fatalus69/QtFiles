@@ -21,6 +21,7 @@
 #include <string>
 
 #include "file_operations.h"
+#include "builders/modal_builder.h"
 #include "types.h"
 #include "utils.h"
 
@@ -55,4 +56,5 @@ private:
     QMap<QString, QPixmap> icon_cache;
 
     std::string current_path;
+    ModalBuilder modal_builder;
 };
