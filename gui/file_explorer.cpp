@@ -120,11 +120,13 @@ void FileExplorer::keyPressEvent(QKeyEvent *event) {
       if (item) {
         handleRename(item);
       }  
+      break;
     }
     case Qt::Key_Delete: {
       if (item) {
         handleDelete(item);
       }
+      break;
     }
     default:
       QWidget::keyPressEvent(event);
@@ -133,6 +135,8 @@ void FileExplorer::keyPressEvent(QKeyEvent *event) {
 
 void FileExplorer::showContextMenu(const QPoint &pos) 
 {
+  QTreeWidgetItem *current_item = tree_widget->currentItem();
+
   QAction *create_file_action = new QAction("File", this);
   QAction *create_directory_action = new QAction("Directory", this);
 
@@ -147,6 +151,20 @@ void FileExplorer::showContextMenu(const QPoint &pos)
   QMenu new_entity_menu("New", this);
   new_entity_menu.addAction(create_file_action);
   new_entity_menu.addAction(create_directory_action);
+ 
+  if (current_item) {
+    QAction *rename_action = new QAction("Rename", this);
+    QAction *delete_action = new QAction("Delete", this);
+
+    connect(rename_action, &QAction::triggered, this,
+      [this, current_item]() { handleRename(current_item); });
+
+    connect(delete_action, &QAction::triggered, this,
+      [this, current_item]() { handleDelete(current_item); });
+
+    context_menu.addAction(rename_action);
+    context_menu.addAction(delete_action);
+  }
 
   context_menu.addMenu(&new_entity_menu);
 
