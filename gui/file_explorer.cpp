@@ -121,6 +121,11 @@ void FileExplorer::keyPressEvent(QKeyEvent *event) {
         handleRename(item);
       }  
     }
+    case Qt::Key_Delete: {
+      if (item) {
+        handleDelete(item);
+      }
+    }
     default:
       QWidget::keyPressEvent(event);
   }
@@ -200,6 +205,28 @@ void FileExplorer::handleRename(QTreeWidgetItem *item) {
     // Reload current directory after changing filenames
     loadFiles(QString::fromStdString(current_path));
   });
+}
+
+void FileExplorer::handleDelete(QTreeWidgetItem *item) {
+  QWidget *file_widget = tree_widget->itemWidget(item, 0);
+  if (!file_widget) return;
+
+  QHBoxLayout *layout = qobject_cast<QHBoxLayout*>(file_widget->layout());
+  if (!layout) return;
+
+  QLabel *filename_label = file_widget->findChild<QLabel *>("filename_label");
+  if (!filename_label) return;
+
+  QString filename = filename_label->text();
+  std::string filepath = current_path + PATH_SEPARATOR + filename.toStdString();
+  bool deleted = deleteFile(filepath);
+
+  if (!deleted) {
+    this->modal_builder.showErrorModal("Failed to delete the file or directory.");
+    return;
+  }
+
+  loadFiles(QString::fromStdString(current_path));
 }
 
 void FileExplorer::onDirectoryEntered()

@@ -37,6 +37,7 @@ private slots:
     void openSettings();
     void keyPressEvent(QKeyEvent *event);
     void handleRename(QTreeWidgetItem *item);
+    void handleDelete(QTreeWidgetItem *item);
     void handleEntityCreate(FileType type);
     void showContextMenu(const QPoint &pos);
 

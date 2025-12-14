@@ -40,10 +40,9 @@ if [ "$test" -eq 1 ]; then
     [ -e "$TESTS_DIR/test_dir" ] && rm -rf "$TESTS_DIR/test_dir"
     [ -e "$TESTS_DIR/modified_dir" ] && rm -rf "$TESTS_DIR/modified_dir"
 
-    # prettier output than ctest
-    ./"$BUILD_DIR"/run_tests
+    ctest --test-dir build --output-on-failure
 fi
 
 if [ "$run" -eq 1 ]; then
-    ./"$BUILD_DIR/QtFiles"
+    "$BUILD_DIR/QtFiles"
 fi
