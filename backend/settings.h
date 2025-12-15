@@ -1,17 +1,24 @@
 #pragma once
+
+#include <nlohmann/json.hpp>
+
 #include <string>
 #include <vector>
 #include <utility>
-#include <nlohmann/json.hpp>
+#include <fstream>
+#include <iostream>
+#include <filesystem>
+
+#include "utils.h"
 
 class Settings {
 private:
-    std::string SETTINGS_FP;
+    std::filesystem::path SETTINGS_FP;
     const std::string SETTINGS_DIR = ".QtFiles";
     const std::string SETTINGS_FILENAME = "settings.json";
 
-    void initSettings();
     nlohmann::json settings_json;
+    void initSettings();
 
 public:
     Settings();

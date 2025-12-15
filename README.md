@@ -8,6 +8,10 @@
 - `CMake` >= 3.14
 
 ## Quick start
+On Debian like:
+```bash
+sudo apt install qt6-base-dev qt6-declarative-dev qml6-module-qtqml qml6-module-qtquick-controls qml6-module-qtquick
+```
 Add git hooks:
 ```bash
 bash scripts/setup-git-hooks.sh

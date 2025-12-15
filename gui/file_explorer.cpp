@@ -69,7 +69,7 @@ void FileExplorer::loadFiles(const QString &path)
   current_path = path.toStdString();
   directory_display->setText(path);
   
-  auto entries = listFiles(current_path);
+  std::vector<FileEntry> entries = listFiles(current_path);
 
   createList(entries);
 }

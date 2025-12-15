@@ -6,7 +6,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets)
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Qml)
 
 include(FetchContent)
 
@@ -47,6 +47,7 @@ target_link_libraries(QtFiles PRIVATE
   Qt6::Core
   Qt6::Gui
   Qt6::Widgets
+  Qt6::Qml
   nlohmann_json::nlohmann_json
   backend
 )

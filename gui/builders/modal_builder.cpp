@@ -1,8 +1,6 @@
 #include "modal_builder.h"
 
-ModalBuilder::ModalBuilder() {
-
-}
+ModalBuilder::ModalBuilder() {}
 
 QString ModalBuilder::showInputModal(QWidget* parent, const QString& modal_label, const QString& input_label) {
     QInputDialog *modal = new QInputDialog(parent);

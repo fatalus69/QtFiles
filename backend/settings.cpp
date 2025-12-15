@@ -1,25 +1,21 @@
 #include "settings.h"
-#include "utils.h"
-#include <nlohmann/json.hpp>
-#include <fstream>
-#include <iostream>
-#include <filesystem>
 
 using json = nlohmann::json;
+namespace fs = std::filesystem;
 
 Settings::Settings() {
-    this->SETTINGS_FP = getHomeDirectory() + separator() + this->SETTINGS_DIR + separator() + this->SETTINGS_FILENAME;
+    this->SETTINGS_FP = fs::path(getHomeDirectory() + separator() + this->SETTINGS_DIR + separator() + this->SETTINGS_FILENAME);
     this->initSettings();
 }
 
 void Settings::initSettings() {
-    if (std::filesystem::exists(this->SETTINGS_FP)) {
+    if (fs::exists(this->SETTINGS_FP)) {
         std::ifstream file(this->SETTINGS_FP);
         file >> settings_json;
         return;
     }
 
-    std::filesystem::create_directories(getHomeDirectory() + separator() + SETTINGS_DIR);
+    fs::create_directories(getHomeDirectory() + PATH_SEPARATOR + SETTINGS_DIR);
 
     // Init values
     settings_json = {
@@ -37,7 +33,7 @@ void Settings::initSettings() {
 //Not used
 std::vector<std::pair<std::string, std::string>> Settings::loadSettings() {
     std::vector<std::pair<std::string, std::string>> result;
-    if (std::filesystem::exists(this->SETTINGS_FP)) {
+    if (fs::exists(this->SETTINGS_FP)) {
         std::ifstream file(this->SETTINGS_FP);
         file >> settings_json;
         for (auto& [k, v] : settings_json.items()) {
