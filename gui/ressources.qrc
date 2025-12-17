@@ -1,0 +1,8 @@
+<!DOCTYPE RCC>
+<RCC>
+  <qresource prefix="/icons">
+    <file>assets/file.png</file>
+    <file>assets/folder_empty.png</file>
+    <file>assets/folder_filled.png</file>
+  </qresource>
+</RCC>

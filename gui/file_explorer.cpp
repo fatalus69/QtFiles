@@ -31,10 +31,6 @@ void FileExplorer::initUI()
 
   main_layout->setMenuBar(menu_bar);
 
-  icon_cache["folder_filled"] = QPixmap("gui/assets/folder_filled.png");
-  icon_cache["folder_empty"] = QPixmap("gui/assets/folder_empty.png");
-  icon_cache["file"] = QPixmap("gui/assets/file.png");
-
   directory_display = new QLineEdit(this);
   connect(directory_display, &QLineEdit::returnPressed, this, &FileExplorer::onDirectoryEntered);
 
@@ -49,83 +45,59 @@ void FileExplorer::initUI()
   main_layout->addLayout(top_bar);
 
   // Tree widget
-  tree_widget = new QTreeWidget(this);
-  tree_widget->setRootIsDecorated(false);
-  tree_widget->setColumnCount(2);
-  tree_widget->setHeaderLabels({"Name", "Size"});
+  tree_view = new QTreeView(this);
+  tree_view->setRootIsDecorated(false);
+  tree_view->setAlternatingRowColors(true);
+  tree_view->setUniformRowHeights(true);
 
-  QHeaderView *header = tree_widget->header();
+  file_model = new FileModel(this);
+  tree_view->setModel(file_model);
+
+  tree_view->setRootIsDecorated(false);
+  tree_view->setAlternatingRowColors(true);
+  tree_view->setSortingEnabled(true);
+  tree_view->setSelectionMode(QAbstractItemView::SingleSelection);
+  tree_view->setSelectionBehavior(QAbstractItemView::SelectRows);
+  tree_view->setIconSize(QSize(16,16));
+
+  tree_view->setEditTriggers(
+    QAbstractItemView::EditKeyPressed |
+    QAbstractItemView::SelectedClicked
+  );
+
+  QHeaderView *header = tree_view->header();
   header->setSectionResizeMode(0, QHeaderView::Stretch);
   header->setSectionResizeMode(1, QHeaderView::ResizeToContents);
 
-  connect(tree_widget, &QTreeWidget::itemDoubleClicked,
-          this, &FileExplorer::onItemDoubleClicked);
+  connect(tree_view, &QTreeView::doubleClicked,
+          this, &FileExplorer::onItemActivated);
 
-  main_layout->addWidget(tree_widget);
+  main_layout->addWidget(tree_view);
 }
 
 void FileExplorer::loadFiles(const QString &path)
 {
   current_path = path.toStdString();
   directory_display->setText(path);
-  
-  auto entries = listFiles(current_path);
 
-  createList(entries);
-}
-
-
-void FileExplorer::createList(auto entries, ListMode mode) {
-  tree_widget->clear();
-
-  for (const auto &file : entries) {
-    QString icon_key = file.type == FileType::Directory ? "folder_filled" : "file";
-
-    QWidget *file_widget = new QWidget();
-    QHBoxLayout *file_layout = new QHBoxLayout(file_widget);
-    file_layout->setContentsMargins(4, 2, 4, 2);
-    file_layout->setSpacing(6);
-
-    QLabel *icon_label = new QLabel();
-    icon_label->setPixmap(icon_cache[icon_key]);
-    icon_label->setFixedSize(16, 16);
-    icon_label->setScaledContents(true);
-
-    std::string filename = (mode == ListMode::Search) ? file.path : file.name;
-
-    QLabel *filename_label = new QLabel(QString::fromStdString(filename));
-    filename_label->setObjectName("filename_label");
-    file_layout->addWidget(icon_label);
-    file_layout->addWidget(filename_label);
-    file_layout->addStretch();
-
-    QLabel *filesize_label = new QLabel(formatByte(file.size));
-
-    QTreeWidgetItem *item = new QTreeWidgetItem({"", ""});
-    item->setData(0, Qt::UserRole, QString::fromStdString(filename));
-    item->setData(0, Qt::UserRole + 1, file.type == FileType::Directory);
-
-    tree_widget->addTopLevelItem(item);
-    tree_widget->setItemWidget(item, 0, file_widget);
-    tree_widget->setItemWidget(item, 1, filesize_label);
-  }
+  std::vector<FileEntry> entries = listFiles(current_path);
+  file_model->setFiles(std::move(entries));
 }
 
 void FileExplorer::keyPressEvent(QKeyEvent *event) {
-  QTreeWidgetItem *item = tree_widget->currentItem();
+  QModelIndex index = tree_view->currentIndex();
+
+  if (!index.isValid())
+      return;
 
   switch(event->key()) 
   {
     case Qt::Key_F2: {
-      if (item) {
-        handleRename(item);
-      }  
+      tree_view->edit(index);
       break;
     }
     case Qt::Key_Delete: {
-      if (item) {
-        handleDelete(item);
-      }
+      handleDelete(index);
       break;
     }
     default:
@@ -135,7 +107,7 @@ void FileExplorer::keyPressEvent(QKeyEvent *event) {
 
 void FileExplorer::showContextMenu(const QPoint &pos) 
 {
-  QTreeWidgetItem *current_item = tree_widget->currentItem();
+  QModelIndex index = tree_view->currentIndex();
 
   QAction *create_file_action = new QAction("File", this);
   QAction *create_directory_action = new QAction("Directory", this);
@@ -152,15 +124,16 @@ void FileExplorer::showContextMenu(const QPoint &pos)
   new_entity_menu.addAction(create_file_action);
   new_entity_menu.addAction(create_directory_action);
  
-  if (current_item) {
+  //TODO: Add rename and delete actions for index
+  if (index.isValid()) {
     QAction *rename_action = new QAction("Rename", this);
     QAction *delete_action = new QAction("Delete", this);
 
     connect(rename_action, &QAction::triggered, this,
-      [this, current_item]() { handleRename(current_item); });
+      [this, index]() { tree_view->edit(index); });
 
     connect(delete_action, &QAction::triggered, this,
-      [this, current_item]() { handleDelete(current_item); });
+      [this, index]() { handleDelete(index); });
 
     context_menu.addAction(rename_action);
     context_menu.addAction(delete_action);
@@ -190,58 +163,16 @@ void FileExplorer::handleEntityCreate(FileType type) {
   }
 }
 
-void FileExplorer::handleRename(QTreeWidgetItem *item) {
-  QWidget *file_widget = tree_widget->itemWidget(item, 0);
-  if (!file_widget) return;
-
-  QHBoxLayout *layout = qobject_cast<QHBoxLayout*>(file_widget->layout());
-  if (!layout) return;
-
-  QLabel *filename_label = file_widget->findChild<QLabel *>("filename_label");
-  if (!filename_label) return;
-
-  QString filename = filename_label->text();
-
-  QLineEdit *edit = new QLineEdit(filename, file_widget);
-  edit->selectAll();
-  layout->replaceWidget(filename_label, edit);
-  filename_label->hide();
-
-  edit->setFocus();
-
-  connect(edit, &QLineEdit::editingFinished, this, [this, filename, edit, filename_label, item]() {
-    QString new_name = edit->text().trimmed();
-
-    if (!new_name.isEmpty() && new_name != filename_label->text()) {
-      std::string filepath = current_path + PATH_SEPARATOR + filename.toStdString();
-
-      std::string new_path = current_path + PATH_SEPARATOR + new_name.toStdString();
-
-      renameFile(filepath, new_path);
-    }
-
-    // Reload current directory after changing filenames
-    loadFiles(QString::fromStdString(current_path));
-  });
-}
-
-void FileExplorer::handleDelete(QTreeWidgetItem *item) {
-  QWidget *file_widget = tree_widget->itemWidget(item, 0);
-  if (!file_widget) return;
-
-  QHBoxLayout *layout = qobject_cast<QHBoxLayout*>(file_widget->layout());
-  if (!layout) return;
-
-  QLabel *filename_label = file_widget->findChild<QLabel *>("filename_label");
-  if (!filename_label) return;
-
-  QString filename = filename_label->text();
-  std::string filepath = current_path + PATH_SEPARATOR + filename.toStdString();
-  bool deleted = deleteFile(filepath);
-
-  if (!deleted) {
-    this->modal_builder.showErrorModal("Failed to delete the file or directory.");
+void FileExplorer::handleDelete(const QModelIndex& index) {
+  if (!index.isValid())
     return;
+
+  const FileEntry& file = file_model->fileAt(index.row());
+
+  bool deleted = deleteFile(file.path);
+  if (!deleted) {
+      modal_builder.showErrorModal("Failed to delete the file or directory.");
+      return;
   }
 
   loadFiles(QString::fromStdString(current_path));
@@ -261,27 +192,25 @@ void FileExplorer::onDirectoryEntered()
   loadFiles(QString::fromStdString(dir_path));
 }
 
-void FileExplorer::onItemDoubleClicked(QTreeWidgetItem *item, int column)
+void FileExplorer::onItemActivated(const QModelIndex& index)
 {
-  QString filepath = item->data(0, Qt::UserRole).toString();
-  bool is_directory = item->data(0, Qt::UserRole + 1).toBool();
+  if (!index.isValid())
+        return;
 
-  if (is_directory) {
-    std::string filepath_string = filepath.toStdString();
-    if (filepath_string.find(current_path) == std::string::npos) {
-      filepath_string = current_path + PATH_SEPARATOR + filepath_string;
+    const FileEntry& file = file_model->fileAt(index.row());
+
+    if (file.type == FileType::Directory) {
+        loadFiles(QString::fromStdString(file.path));
     }
-
-    loadFiles(QString::fromStdString(filepath_string));
-  }
 }
 
 void FileExplorer::onSearchEntered()
 {
   std::string query = search_bar->text().toStdString();
-  auto search_result = searchDirectory(current_path, query);
+  std::vector<FileEntry> search_result = searchDirectory(current_path, query);
 
-  createList(search_result, ListMode::Search);
+  // TODO: fix display showing everything, like it would with loadFiles
+  file_model->setFiles(std::move(search_result));
 }
 
 /**

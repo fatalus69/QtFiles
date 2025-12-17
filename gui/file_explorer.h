@@ -22,29 +22,29 @@
 
 #include "file_operations.h"
 #include "builders/modal_builder.h"
+#include "models/file_model.h"
 #include "types.h"
 #include "utils.h"
 
 class FileExplorer : public QWidget 
 {
+Q_OBJECT
 public:
   FileExplorer();
 
 private slots:
-    void onItemDoubleClicked(QTreeWidgetItem *item, int column);
+    void onItemActivated(const QModelIndex& index);
     void onDirectoryEntered();
     void onSearchEntered();
     void openSettings();
     void keyPressEvent(QKeyEvent *event);
-    void handleRename(QTreeWidgetItem *item);
-    void handleDelete(QTreeWidgetItem *item);
+    void handleDelete(const QModelIndex& index);
     void handleEntityCreate(FileType type);
     void showContextMenu(const QPoint &pos);
 
 private:
     void initUI();
     void loadFiles(const QString &path);
-    void createList(auto entries, ListMode mode = ListMode::Normal);
 
     QVBoxLayout *main_layout;
     QHBoxLayout *top_bar;
@@ -52,7 +52,8 @@ private:
     QMenuBar *menu_bar;
     QLineEdit *directory_display;
     QLineEdit *search_bar;
-    QTreeWidget *tree_widget;
+    QTreeView *tree_view;
+    FileModel* file_model;
 
     QMap<QString, QPixmap> icon_cache;
 

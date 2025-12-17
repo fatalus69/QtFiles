@@ -1,7 +1,7 @@
 .vscode
 build/*
-vcpkg_installed
+.cache
 
 # directories created by tests
 tests/modified_dir
-tesets/test_dir
+tests/test_dir
