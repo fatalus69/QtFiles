@@ -2,7 +2,7 @@
 #include <filesystem>
 #include <gtest/gtest.h>
 
-#include "../src/backend/file_operations.h"
+#include "../src/core/file_operations.h"
 
 namespace fs = std::filesystem;
 

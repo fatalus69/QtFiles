@@ -29,10 +29,11 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 add_library(backend
-  src/backend/file_operations.cpp
-  src/backend/settings.cpp
+  src/core/file_operations.cpp
+  src/core/settings.cpp
 )
-target_include_directories(backend PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/backend)
+target_include_directories(backend PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/core)
+target_include_directories(backend PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/utils)
 # Add QtCore so we can return QStrings
 target_link_libraries(backend PUBLIC Qt6::Core)
 target_link_libraries(backend PRIVATE nlohmann_json::nlohmann_json)

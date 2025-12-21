@@ -2,7 +2,7 @@
 #include <filesystem>
 #include <gtest/gtest.h>
 
-#include "../src/backend/utils.h"
+#include "../src/utils/utils.h"
 
 TEST(utils_test, toLowerCase) {
     EXPECT_EQ(toLowercase("HelloWorld"), "helloworld");
