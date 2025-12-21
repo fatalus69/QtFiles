@@ -29,21 +29,21 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 add_library(backend
-  backend/file_operations.cpp
-  backend/settings.cpp
+  src/backend/file_operations.cpp
+  src/backend/settings.cpp
 )
 target_include_directories(backend PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/backend)
 # Add QtCore so we can return QStrings
 target_link_libraries(backend PUBLIC Qt6::Core)
 target_link_libraries(backend PRIVATE nlohmann_json::nlohmann_json)
 
-qt_add_resources(QtFilesRessources gui/ressources.qrc)
+qt_add_resources(QtFilesRessources src/ressources.qrc)
 
 add_executable(QtFiles
-  gui/main.cpp
-  gui/file_explorer.cpp
-  gui/builders/modal_builder.cpp
-  gui/models/file_model.cpp
+  src/main.cpp
+  src/gui/file_explorer.cpp
+  src/gui/builders/modal_builder.cpp
+  src/gui/models/file_model.cpp
   ${QtFilesRessources}
 )
 
