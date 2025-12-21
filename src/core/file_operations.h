@@ -8,8 +8,8 @@
 #include <iostream>
 #include <cctype>
 
-#include "utils.h"
-#include "types.h"
+#include "../utils/utils.h"
+#include "../utils/types.h"
 
 // Listings
 std::vector<FileEntry> listFiles(const std::string& directory_path, bool hide_hidden_files = true);

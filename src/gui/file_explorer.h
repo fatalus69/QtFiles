@@ -20,11 +20,11 @@
 
 #include <string>
 
-#include "file_operations.h"
+#include "../utils/types.h"
+#include "../utils/utils.h"
+#include "../core/file_operations.h"
 #include "builders/modal_builder.h"
 #include "models/file_model.h"
-#include "types.h"
-#include "utils.h"
 
 class FileExplorer : public QWidget 
 {

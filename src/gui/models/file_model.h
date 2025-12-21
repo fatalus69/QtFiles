@@ -13,9 +13,9 @@
 #include <vector>
 #include <filesystem>
 
-#include "types.h"
-#include "utils.h"
-#include "file_operations.h"
+#include "../../utils/types.h"
+#include "../../utils/utils.h"
+#include "../../core/file_operations.h"
 
 class FileModel : public QAbstractTableModel {
   Q_OBJECT
