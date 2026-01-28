@@ -1,9 +1,9 @@
 #include "file_model.h"
 
 FileModel::FileModel(QObject *parent) : QAbstractTableModel(parent) {
-  icon_cache["folder_filled"] = QIcon(":/icons/folder_filled.png");
-  icon_cache["folder_empty"] = QIcon(":/icons/folder_empty.png");
-  icon_cache["file"] = QIcon(":/icons/file.png");
+  icon_cache["folder_filled"] = QIcon(":/icons/assets/folder_filled.png");
+  icon_cache["folder_empty"] = QIcon(":/icons/assets/folder_empty.png");
+  icon_cache["file"] = QIcon(":/icons/assets/file.png");
 }
 
 int FileModel::rowCount(const QModelIndex &parent) const {
@@ -48,25 +48,22 @@ const FileEntry &FileModel::fileAt(int row) const
 
 QVariant FileModel::data(const QModelIndex &model_index, int role) const
 {
-  if (role != Qt::DisplayRole) {
+  if (!model_index.isValid()) {
     return {};
   }
 
   const auto &files_from_index = files[model_index.row()];
 
-  // TODO: expand with settings
   if (role == Qt::DisplayRole) {
     if (model_index.column() == 0) {
       return QString::fromStdString(files_from_index.name);
     }
-  
     if (model_index.column() == 1) {
       return formatByte(files_from_index.size);
     }
   }
 
   if (role == Qt::DecorationRole && model_index.column() == 0) {
-      return QApplication::style()->standardIcon(QStyle::SP_DirIcon);
     if (files_from_index.type == FileType::Directory) {
       return icon_cache["folder_filled"];
     } else {
