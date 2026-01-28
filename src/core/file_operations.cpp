@@ -32,24 +32,39 @@ std::vector<FileEntry> listFiles(const std::string& directory_path, bool hide_hi
     return result;
 }
 
-int levenshtein(const std::string& s1, const std::string& s2) {
-    const size_t len1 = s1.size(), len2 = s2.size();
-    std::vector<std::vector<int>> dp(len1 + 1, std::vector<int>(len2 + 1));
+int levenshtein(const std::string& s1, const std::string& s2, int max_dist) {
+    const int len1 = s1.size();
+    const int len2 = s2.size();
 
-    for (size_t i = 0; i <= len1; ++i) dp[i][0] = i;
-    for (size_t j = 0; j <= len2; ++j) dp[0][j] = j;
+    if (std::abs(len1 - len2) > max_dist)
+        return max_dist + 1;
 
-    for (size_t i = 1; i <= len1; ++i) {
-        for (size_t j = 1; j <= len2; ++j) {
-            if (s1[i - 1] == s2[j - 1]) {
-                dp[i][j] = dp[i - 1][j - 1];
-            } else {
-                dp[i][j] = std::min({ dp[i - 1][j] + 1, dp[i][j - 1] + 1, dp[i - 1][j - 1] + 1 });
-            }
+    std::vector<int> prev(len2 + 1), curr(len2 + 1);
+
+    for (int j = 0; j <= len2; ++j)
+        prev[j] = j;
+
+    for (int i = 1; i <= len1; ++i) {
+        curr[0] = i;
+        int min_in_row = curr[0];
+
+        for (int j = 1; j <= len2; ++j) {
+            int cost = (s1[i - 1] == s2[j - 1]) ? 0 : 1;
+            curr[j] = std::min({
+                prev[j] + 1,
+                curr[j - 1] + 1,
+                prev[j - 1] + cost
+            });
+            min_in_row = std::min(min_in_row, curr[j]);
         }
+
+        if (min_in_row > max_dist)
+            return max_dist + 1;
+
+        std::swap(prev, curr);
     }
 
-    return dp[len1][len2];
+    return prev[len2];
 }
 
 std::vector<FileEntry> searchDirectory(const std::string& directory_path, std::string& query) {
@@ -70,8 +85,12 @@ std::vector<FileEntry> searchDirectory(const std::string& directory_path, std::s
         int distance;
         if (filename_lc.find(search_lc) != std::string::npos) {
             distance = 0;
+        } else if (std::abs((int)filename_lc.length() - (int)search_lc.length()) > max_distance) {
+            continue;
+        } else if (filename_lc[0] != search_lc[0]) {
+            continue;
         } else {
-            distance = levenshtein(search_lc, filename_lc);
+            distance = levenshtein(search_lc, filename_lc, max_distance);
         }
 
         if (distance <= max_distance) {
@@ -80,6 +99,7 @@ std::vector<FileEntry> searchDirectory(const std::string& directory_path, std::s
             file_entry.path = entry.path().string();
             file_entry.type = entry.is_directory() ? FileType::Directory : FileType::File;
             file_entry.size = getFileSize(entry);
+            file_entry.match_score = distance;
 
             result.push_back(file_entry);
         }
