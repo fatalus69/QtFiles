@@ -1,20 +1,28 @@
 # QtFiles
 
-**A lightweight, work‑in‑progress file explorer built with [Qt6](https://www.qt.io/product/qt6) and C++.**
+**A lightweight, work‑in‑progress file explorer built with Qt6 and C++.**
 
 ## Requirements
 - `Qt 6`
 - `C++ 20` or newer
 - `CMake` >= 3.14
 
+### Dependencies
+- `qt6-base-dev`
+- `qt6-declarative-dev`
+
+<hr>
+
 ## Quick start
-Add git hooks:
 ```bash
+# Install dependencies or do it manually
+bash scripts/install_deps.sh
+# Add git hooks
 bash scripts/setup-git-hooks.sh
 ```
 
-The script works the same for Windows - in case you have Qt6 installed.
-So on Windows you simply run `build.ps1`
+<br>
+
 ```bash
 # build
 bash build.sh
