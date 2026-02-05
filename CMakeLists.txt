@@ -45,6 +45,7 @@ add_executable(QtFiles
   src/gui/file_explorer.cpp
   src/gui/builders/modal_builder.cpp
   src/gui/models/file_model.cpp
+  src/gui/components/inputs/clickable_line_edit.h
   ${QtFilesRessources}
 )
 

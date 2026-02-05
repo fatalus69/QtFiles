@@ -25,6 +25,7 @@
 #include "../core/file_operations.h"
 #include "builders/modal_builder.h"
 #include "models/file_model.h"
+#include "components/inputs/clickable_line_edit.h"
 
 class FileExplorer : public QWidget 
 {
@@ -50,7 +51,7 @@ private:
     QHBoxLayout *top_bar;
 
     QMenuBar *menu_bar;
-    QLineEdit *directory_display;
+    ClickableLineEdit *directory_display;
     QLineEdit *search_bar;
     QTreeView *tree_view;
     FileModel* file_model;

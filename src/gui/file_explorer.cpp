@@ -31,12 +31,16 @@ void FileExplorer::initUI()
 
   main_layout->setMenuBar(menu_bar);
 
-  directory_display = new QLineEdit(this);
+  directory_display = new ClickableLineEdit(this);
+  connect(directory_display, &ClickableLineEdit::clicked, this, [this]() {
+    directory_display->selectAll();
+  });
   connect(directory_display, &QLineEdit::returnPressed, this, &FileExplorer::onDirectoryEntered);
 
   search_bar = new QLineEdit(this);
   search_bar->setFixedWidth(200);
   search_bar->setPlaceholderText("Search for file");
+  search_bar->setSelection(0, 0);
   connect(search_bar, &QLineEdit::returnPressed, this, &FileExplorer::onSearchEntered);
 
   top_bar = new QHBoxLayout();
