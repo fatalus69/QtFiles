@@ -30,6 +30,7 @@ done
 
 if [[ "$clean" -eq 1 ]] && [[ -e "$BUILD_DIR" ]]; then
     rm -rf "$BUILD_DIR"
+    rm -rf "$PROJECT_ROOT/.cache"
 fi
 
 mkdir -p "$BUILD_DIR"

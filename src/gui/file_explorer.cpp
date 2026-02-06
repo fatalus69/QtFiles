@@ -6,7 +6,7 @@
 FileExplorer::FileExplorer(): QWidget()
 {
   setWindowTitle("QtFiles");
-  setFixedSize(800, 400); //Maybe dont do that.
+
   initUI();
 
   this->modal_builder = ModalBuilder();
@@ -103,6 +103,10 @@ void FileExplorer::keyPressEvent(QKeyEvent *event) {
     }
     case Qt::Key_Delete: {
       handleDelete(index);
+      break;
+    }
+    case Qt::Key_Return: {
+      onItemActivated(index);
       break;
     }
     default:
