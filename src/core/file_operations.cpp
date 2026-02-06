@@ -186,3 +186,21 @@ filesize getFileSize(const fs::directory_entry& entry, filesize default_size) {
 
     return default_size;
 }
+
+FileProperties getFileProperties(const std::string& full_path) {
+    fs::path path = full_path;
+    FileProperties properties;
+    struct stat file_stat;
+
+    properties.path = full_path;
+
+    if (fs::exists(path) && stat(full_path.c_str(), &file_stat) == 0) {
+        if (file_stat.st_atime != 0 && file_stat.st_mtime != 0 && file_stat.st_ctime != 0) {
+            properties.access_time = file_stat.st_atime;
+            properties.modification_time = file_stat.st_mtime;
+            properties.creation_time = file_stat.st_ctime;
+        }
+    }
+
+    return properties;
+}

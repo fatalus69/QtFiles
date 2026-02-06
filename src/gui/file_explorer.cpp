@@ -137,6 +137,7 @@ void FileExplorer::showContextMenu(const QPoint &pos)
   if (index.isValid()) {
     QAction *rename_action = new QAction("Rename", this);
     QAction *delete_action = new QAction("Delete", this);
+    QAction *open_properties_action = new QAction("Properties", this);
 
     connect(rename_action, &QAction::triggered, this,
       [this, index]() { tree_view->edit(index); });
@@ -144,8 +145,15 @@ void FileExplorer::showContextMenu(const QPoint &pos)
     connect(delete_action, &QAction::triggered, this,
       [this, index]() { handleDelete(index); });
 
+    connect(open_properties_action, &QAction::triggered, this,
+      [this, index]() { 
+        const FileEntry& file = file_model->fileAt(index.row());
+        modal_builder.showPropertiesModal(file);
+      });
+
     context_menu.addAction(rename_action);
     context_menu.addAction(delete_action);
+    context_menu.addAction(open_properties_action);
   }
 
   context_menu.addMenu(&new_entity_menu);

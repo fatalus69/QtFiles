@@ -5,6 +5,9 @@
 #include <cstdlib>
 #include <algorithm>
 #include <QString>
+#include <QDateTime>
+#include <sstream>
+#include <iomanip>
 
 #include "types.h"
 
@@ -54,6 +57,10 @@ inline QString formatByte(filesize bytes, double multiplier = 1024.0) {
 inline std::string toLowercase(std::string str) {
     std::transform(str.begin(), str.end(), str.begin(), ::tolower);
     return str;
+}
+
+inline QString formatTimestamp(int timestamp) {
+    return QDateTime::fromSecsSinceEpoch(timestamp).toString("dd-MM-yyy HH:mm:ss");
 }
 
 #endif

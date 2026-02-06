@@ -8,6 +8,8 @@
 #include <iostream>
 #include <cctype>
 
+#include <sys/stat.h>
+
 #include "../utils/utils.h"
 #include "../utils/types.h"
 
@@ -16,6 +18,7 @@ std::vector<FileEntry> listFiles(const std::string& directory_path, bool hide_hi
 std::vector<FileEntry> searchDirectory(const std::string& directory_path, std::string& query);
 
 long long getFileSize(const std::filesystem::directory_entry& entry, filesize default_size = 2048);
+FileProperties getFileProperties(const std::string& full_path);
 
 /**
  * TODO: Perhaps rename functions, since those are the general functions for 

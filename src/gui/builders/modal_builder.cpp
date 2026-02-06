@@ -34,3 +34,25 @@ void ModalBuilder::showErrorModal(const QString& message) {
     msg_box.setStandardButtons(QMessageBox::Ok);
     msg_box.exec();
 }
+
+void ModalBuilder::showPropertiesModal(const FileEntry& file_entry) {
+    QMessageBox msg_box;
+    FileProperties properties = getFileProperties(file_entry.path);
+
+    msg_box.setIcon(QMessageBox::Information);
+    msg_box.setWindowTitle("Properties");
+    msg_box.setText(QString::fromStdString(file_entry.name));
+
+    QString details = QString("Type: ") + (file_entry.type == FileType::Directory ? "Directory" : "File") + "\n";
+    details += QString("Size: ") + formatByte(file_entry.size) + "\n";
+    details += QString("Path: ") + QString::fromStdString(file_entry.path) + "\n";
+
+    details += QString("Last Access Time: ") + formatTimestamp(properties.access_time) + "\n";
+    details += QString("Modification Time: ") + formatTimestamp(properties.modification_time) + "\n";
+    details += QString("Creation Time: ") + formatTimestamp(properties.creation_time) + "\n";
+
+    msg_box.setInformativeText(details);
+    msg_box.setStandardButtons(QMessageBox::Ok);
+
+    msg_box.exec();
+}

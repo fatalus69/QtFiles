@@ -17,6 +17,12 @@ struct FileEntry {
     int match_score;
 };
 
+struct FileProperties {
+    std::string path;
+    int access_time;
+    int modification_time;
+    int creation_time;
+};
 // UI: maybe move this into a gui/types.h file?
 // Perhpas add Favourites, ...
 enum class ListMode {
