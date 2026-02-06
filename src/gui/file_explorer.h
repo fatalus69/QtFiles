@@ -19,6 +19,8 @@
 #include <filesystem>
 
 #include <string>
+#include <sstream>
+#include <vector>
 
 #include "../utils/types.h"
 #include "../utils/utils.h"

@@ -81,11 +81,12 @@ void FileExplorer::initUI()
 
 void FileExplorer::loadFiles(const QString &path)
 {
-  current_path = path.toStdString();
   directory_display->setText(path);
-
-  std::vector<FileEntry> entries = listFiles(current_path);
+  
+  std::vector<FileEntry> entries = listFiles(path.toStdString());
   file_model->setFiles(std::move(entries));
+
+  current_path = path.toStdString();
 }
 
 void FileExplorer::keyPressEvent(QKeyEvent *event) {
@@ -187,13 +188,23 @@ void FileExplorer::onDirectoryEntered()
   std::string dir_path = directory_display->text().toStdString();
   std::filesystem::path path(dir_path);
 
-  if (!std::filesystem::exists(path) || !std::filesystem::is_directory(path)) {
-    this->modal_builder.showErrorModal("The specified path does not exist.");
+  try {
+    loadFiles(QString::fromStdString(dir_path));
+  } catch(const std::filesystem::filesystem_error& e) {
+    qDebug() << "Error opening directory: " << e.what();
+
+    std::istringstream error_stream(e.what());
+    std::vector<std::string> error_parts;
+    std::string error_part;
+
+    while (std::getline(error_stream, error_part, ':')) {
+      error_parts.push_back(error_part);
+    }
+
+    this->modal_builder.showErrorModal("Failed to open directory. " + QString::fromStdString(error_parts.back()));
     directory_display->setText(QString::fromStdString(current_path));
     return;
   }
-
-  loadFiles(QString::fromStdString(dir_path));
 }
 
 void FileExplorer::onItemActivated(const QModelIndex& index)
