@@ -43,6 +43,15 @@ TEST(file_operation_test, renameFile) {
     EXPECT_EQ(renameFile(original_test_dir, modified_test_dir), true);
 }
 
+TEST(file_operation_test, getFileProperties) {
+    FileProperties properties = getFileProperties(modified_test_dir.string());
+
+    EXPECT_EQ(properties.path, modified_test_dir.string());
+    EXPECT_NE(properties.access_time, 0);
+    EXPECT_NE(properties.modification_time, 0);
+    EXPECT_NE(properties.creation_time, 0);
+}
+
 TEST(file_operation_test, deleteFile) {
     EXPECT_EQ(deleteFile(modified_test_dir), true);
     EXPECT_EQ(deleteFile(modified_test_dir), false);

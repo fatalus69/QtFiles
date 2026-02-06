@@ -60,7 +60,7 @@ inline std::string toLowercase(std::string str) {
 }
 
 inline QString formatTimestamp(int timestamp) {
-    return QDateTime::fromSecsSinceEpoch(timestamp).toString("dd-MM-yyy HH:mm:ss");
+    return QDateTime::fromSecsSinceEpoch(timestamp).toString("dd-MM-yyyy HH:mm:ss");
 }
 
 #endif
