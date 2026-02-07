@@ -3,7 +3,7 @@
 #include <iostream>
 
 
-FileExplorer::FileExplorer(): QWidget()
+FileExplorer::FileExplorer(std::string initial_path): QWidget()
 {
   setWindowTitle("QtFiles");
 
@@ -12,7 +12,7 @@ FileExplorer::FileExplorer(): QWidget()
   this->modal_builder = ModalBuilder();
 
   // Open Explorer in Users home directory
-  current_path = getHomeDirectory();
+  current_path = initial_path;
   loadFiles(QString::fromStdString(current_path));
 }
 
