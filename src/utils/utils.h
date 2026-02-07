@@ -8,6 +8,7 @@
 #include <QDateTime>
 #include <sstream>
 #include <iomanip>
+#include <QTimeZone>
 
 #include "types.h"
 
@@ -60,7 +61,7 @@ inline std::string toLowercase(std::string str) {
 }
 
 inline QString formatTimestamp(int timestamp) {
-    return QDateTime::fromSecsSinceEpoch(timestamp).toString("dd-MM-yyyy HH:mm:ss");
+    return QDateTime::fromSecsSinceEpoch(timestamp, QTimeZone::systemTimeZone()).toString("dd.MM.yyyy HH:mm:ss");
 }
 
 #endif

@@ -17,3 +17,9 @@ TEST(utils_test, formatByte) {
     EXPECT_EQ(formatByte(0, multiplier_10), "0 B");
     EXPECT_EQ(formatByte(1000000, multiplier_10), "1.00 M");
 }
+
+TEST(utils_test, formatTimestamp) {
+    int timestamp = 1767280763; // 01.01.2026 16:19:23 CET
+    EXPECT_NE(formatTimestamp(0), "01.01.1970 00:00:00");
+    EXPECT_EQ(formatTimestamp(timestamp), "01.01.2026 16:19:23");
+}
