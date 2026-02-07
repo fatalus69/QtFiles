@@ -4,6 +4,7 @@
 #include "gui/file_explorer.h"
 
 int main(int argc, char *argv[]) {
+  QApplication app(argc, argv);
   std::string path;
 
   // TODO: build a proper argument parse for stuff like --debug, ...
@@ -16,7 +17,10 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  QApplication app(argc, argv);
+  if (path.empty()) {
+    path = getHomeDirectory();
+  }
+
   FileExplorer window(path);
 
   window.show();

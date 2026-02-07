@@ -33,7 +33,7 @@ class FileExplorer : public QWidget
 {
 Q_OBJECT
 public:
-  FileExplorer(std::string initial_path = getHomeDirectory());
+  FileExplorer(std::string initial_path);
 
 private slots:
     void onItemActivated(const QModelIndex& index);
