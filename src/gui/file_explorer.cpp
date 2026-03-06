@@ -23,11 +23,22 @@ void FileExplorer::initUI()
 
   main_layout = new QVBoxLayout(this);
   menu_bar = new QMenuBar(this);
-  QMenu *settings_menu = menu_bar->addMenu("File");
+  QMenu *file_menu = menu_bar->addMenu("File");
 
   QAction *open_settings_action = new QAction("Settings", this);
   connect(open_settings_action, &QAction::triggered, this, &FileExplorer::openSettings);
-  settings_menu->addAction(open_settings_action);
+  
+  QAction *create_file_action = new QAction("Create File", this);
+  connect(create_file_action, &QAction::triggered, this,
+    [this]() { handleEntityCreate(FileType::File); });
+  
+  QAction *create_directory_action = new QAction("Create Directory", this);
+  connect(create_directory_action, &QAction::triggered, this,
+    [this]() { handleEntityCreate(FileType::Directory); });
+
+  file_menu->addAction(open_settings_action);
+  file_menu->addAction(create_file_action);
+  file_menu->addAction(create_directory_action);
 
   main_layout->setMenuBar(menu_bar);
 
